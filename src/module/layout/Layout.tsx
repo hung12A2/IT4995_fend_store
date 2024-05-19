@@ -59,20 +59,18 @@ const MyMenu = (props: any) => {
     <Menu>
       <Menu.DashboardItem />
       <Menu.ResourceItem name="areas" />
-      <Menu.ResourceItem name="admins" />
-      <Menu.ResourceItem name="getAllUser" />
       <Menu.ResourceItem name="stores" />
       <Menu.ResourceItem name="request-create-shops" />
       <Menu.ResourceItem name="kiots" />
-      <Menu.ResourceItem name="employees" />
+      <Menu.ResourceItem name="employeesForShop" />
       <Menu.ResourceItem name="categories" />
-      <Menu.ResourceItem name="products" />
-      <Menu.ResourceItem name="request-create-products" />
-      <Menu.ResourceItem name="ordersAdmin" />
-      <Menu.ResourceItem name="ordersKiotAdmin" />
-      <Menu.ResourceItem name="transactions" />
+      <Menu.ResourceItem name="productsForShop" />
+      <Menu.ResourceItem name="request-create-products-for-shop" />
+      <Menu.ResourceItem name="ordersShop" />
+      <Menu.ResourceItem name="ordersKiotShop" />
+      <Menu.ResourceItem name="transaction-shopsForShop" />
       <Menu.ResourceItem name="transaction-shops" />
-      <Menu.ResourceItem name="return-orders" />
+      <Menu.ResourceItem name="return-ordersForShop" />
     </Menu>
   );
 };

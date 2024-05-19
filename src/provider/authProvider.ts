@@ -32,7 +32,22 @@ const checkError = (error: any) => {
 };
 
 const checkAuth = (params: any) => {
-  return localStorage.getItem("user") ? Promise.resolve() : Promise.reject();
+  let user: any = localStorage.getItem("user");
+  user = JSON.parse(user).user;
+  const { status } = user;
+  console.log (status)
+
+  if (status !== "active") { 
+    return Promise.reject({
+      message: 'User not active'
+    })
+  }
+
+  return localStorage.getItem("user") 
+    ? Promise.resolve()
+    : Promise.reject({
+      message: 'User not authenticated'
+    });
 };
 
 const getPermissions = (params: any) => {

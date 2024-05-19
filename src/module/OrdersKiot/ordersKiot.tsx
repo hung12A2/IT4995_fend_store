@@ -304,7 +304,7 @@ export const ShowOrdersKiot = (props: any) => {
             <Datagrid bulkActionButtons={false}>
               <ReferenceField
                 source="idOfProduct"
-                reference="products"
+                reference="productsForShop"
                 label="ProductInfo"
               >
                 <FunctionField
@@ -467,26 +467,13 @@ export const ShowOrdersKiot = (props: any) => {
         </TabbedShowLayout.Tab>
         <TabbedShowLayout.Tab label="transaction">
           <ReferenceManyField
-            reference="transactions"
+            reference="transaction-shopsForShop"
             target="idOfOrder"
             label="Transaction"
           >
             <Datagrid>
               <TextField source="id" />
               <TextField source="idOfUser" />
-              <NumberField source="amountMoney" />
-              <TextField source="type" />
-              <DateField source="createdAt" showTime />
-            </Datagrid>
-          </ReferenceManyField>
-          <ReferenceManyField
-            reference="transaction-shops"
-            target="idOfOrder"
-            label="Transaction Shops"
-          >
-            <Datagrid>
-              <TextField source="id" />
-              <TextField source="idOfShop" />
               <NumberField source="amountMoney" />
               <TextField source="type" />
               <DateField source="createdAt" showTime />

@@ -2,6 +2,8 @@
 /* eslint-disable @next/next/no-img-element */
 import { Button } from "@/components/ui/button";
 import {
+  BooleanField,
+  BooleanInput,
   Datagrid,
   DateField,
   Edit,
@@ -40,21 +42,21 @@ import Image from "next/image";
 const postFilters = [
   <TextInput key={"id"} label="id" source="where.id.like" alwaysOn={true} />,
   <TextInput
-    key={"fullname"}
-    label="Shop Name "
-    source="where.name.like"
+    key={"idOfUser"}
+    label="idOfUser"
+    source="where.idOfUser.like"
     alwaysOn={true}
   />,
   <TextInput
-    key={"email"}
-    label="email"
-    source="where.email.like"
+    key={"idOfShop"}
+    label="idOfShop"
+    source="where.idOfShop.like"
     alwaysOn={true}
   />,
   <TextInput
-    key={"email"}
-    label="Phone"
-    source="where.phoneNumber.like"
+    key={"idOfOrder"}
+    label="idOfOrder"
+    source="where.idOfOrder.like"
     alwaysOn={true}
   />,
 ];
@@ -71,6 +73,7 @@ export const ListReturnOrder = (props: any) => {
         <TextField source="idOfUser" />
         <TextField source="idOfShop" />
         <TextField source="idOfOrder" />
+        <TextField source="isKiot" />
         <TextField source="reason" />
         <FunctionField
           source="image"
@@ -90,7 +93,7 @@ export const ShowReturnOrder = (props: any) => {
   return (
     <Show>
       <TabbedShowLayout>
-        <TabbedShowLayout.Tab label="Order Info">
+        <TabbedShowLayout.Tab label="Return Info">
           <FunctionField
             source="avatar"
             label=""
@@ -158,10 +161,108 @@ export const ShowReturnOrder = (props: any) => {
                 <TextField source="createdAt" label="Shop name" />
               </div>
             </div>
+
+            <div className="">
+              <div className="my-2">isKiot</div>
+              <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
+                <BooleanField source="isKiot" label="Shop name" />
+              </div>
+            </div>
           </div>
         </TabbedShowLayout.Tab>
         <TabbedShowLayout.Tab label="Order Info">
-          <div> Hello 1</div>
+          <FunctionField
+            source="Order Info"
+            render={(record: any) => {
+              const isKiot = record.isKiot;
+              if (isKiot == true) {
+                return (
+                  <ReferenceField source="idOfOrder" reference="ordersKiotShop">
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-4">
+                      <div className="">
+                        <div className="my-2">Id</div>
+                        <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
+                          <TextField source="id" label="Shop name" />
+                        </div>
+                      </div>
+                      <div className="">
+                        <div className="my-2">idOfShop</div>
+                        <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
+                          <TextField source="idOfShop" label="Shop name" />
+                        </div>
+                      </div>
+                      <div className="">
+                        <div className="my-2">idOfUser</div>
+                        <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
+                          <TextField source="idOfUser" label="Shop name" />
+                        </div>
+                      </div>
+                      <div className="">
+                        <div className="my-2">priceOfAll</div>
+                        <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
+                          <TextField source="priceOfAll" label="Shop name" />
+                        </div>
+                      </div>
+                      <div className="">
+                        <div className="my-2">codAmount</div>
+                        <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
+                          <TextField source="codAmount" label="Shop name" />
+                        </div>
+                      </div>
+                      <div className="">
+                        <div className="my-2">idOfUser</div>
+                        <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
+                          <TextField source="idOfUser" label="Shop name" />
+                        </div>
+                      </div>
+                    </div>
+                  </ReferenceField>
+                );
+              } else
+                return (
+                  <ReferenceField source="idOfOrder" reference="ordersShop">
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-4">
+                      <div className="">
+                        <div className="my-2">Id</div>
+                        <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
+                          <TextField source="id" label="Shop name" />
+                        </div>
+                      </div>
+                      <div className="">
+                        <div className="my-2">idOfShop</div>
+                        <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
+                          <TextField source="idOfShop" label="Shop name" />
+                        </div>
+                      </div>
+                      <div className="">
+                        <div className="my-2">idOfUser</div>
+                        <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
+                          <TextField source="idOfUser" label="Shop name" />
+                        </div>
+                      </div>
+                      <div className="">
+                        <div className="my-2">priceOfAll</div>
+                        <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
+                          <TextField source="priceOfAll" label="Shop name" />
+                        </div>
+                      </div>
+                      <div className="">
+                        <div className="my-2">codAmount</div>
+                        <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
+                          <TextField source="codAmount" label="Shop name" />
+                        </div>
+                      </div>
+                      <div className="">
+                        <div className="my-2">idOfUser</div>
+                        <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
+                          <TextField source="idOfUser" label="Shop name" />
+                        </div>
+                      </div>
+                    </div>
+                  </ReferenceField>
+                );
+            }}
+          ></FunctionField>
         </TabbedShowLayout.Tab>
       </TabbedShowLayout>
     </Show>

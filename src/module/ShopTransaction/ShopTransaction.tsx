@@ -91,7 +91,7 @@ export const ShowShopTransaction = (props: any) => {
                 return (
                   <ReferenceField
                     source="idOfOrder"
-                    reference="ordersKiotAdmin"
+                    reference="ordersKiotShop"
                   >
                     <div className="grid grid-cols-2 gap-x-4 gap-y-4">
                       <div className="">
@@ -135,7 +135,7 @@ export const ShowShopTransaction = (props: any) => {
                 );
               } else
                 return (
-                  <ReferenceField source="idOfOrder" reference="ordersAdmin">
+                  <ReferenceField source="idOfOrder" reference="ordersShop">
                     <div className="grid grid-cols-2 gap-x-4 gap-y-4">
                       <div className="">
                         <div className="my-2">Id</div>

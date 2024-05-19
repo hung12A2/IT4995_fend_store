@@ -15,7 +15,7 @@ import {
   ShowRequestShopsDetails,
 } from "@/module/ReqCreateShops/RequestCreateShops";
 import { ListKiots, ShowKiot } from "@/module/Kiots/kiots";
-import { ListEmployee, ShowEmployee } from "@/module/Employees/Employees";
+import { ListEmployee, ShowEmployee, createEmployee } from "@/module/Employees/Employees";
 import { ListAdmin, CreateAdmin, EditAdmin } from "@/module/Admin/admin";
 import {
   CreateCategories,
@@ -23,6 +23,7 @@ import {
   ListCategories,
 } from "@/module/Categories/categories";
 import {
+  CreateRequestProducts,
   ListRequestProducts,
   ShowRequest,
 } from "@/module/CreateProducts/requestCreateProducts";
@@ -83,8 +84,9 @@ export default function Home() {
       />
 
       <Resource
-        name="employees"
+        name="employeesForShop"
         list={ListEmployee}
+        create={createEmployee}
         edit={ShowEmployee}
         icon={BadgeSharpIcon}
         options={{
@@ -93,7 +95,7 @@ export default function Home() {
       />
 
       <Resource
-        name="products"
+        name="productsForShop"
         list={ListProducts}
         edit={ShowProducts}
         icon={ProductionQuantityLimitsOutlinedIcon}
@@ -101,14 +103,16 @@ export default function Home() {
       />
 
       <Resource
-        name="request-create-products"
+        name="request-create-products-for-shop"
         list={ListRequestProducts}
+        create={CreateRequestProducts}
         edit={ShowRequest}
         icon={ProductionQuantityLimitsOutlinedIcon}
+        options={{ label: "Request Products" }}
       />
 
       <Resource
-        name="ordersAdmin"
+        name="ordersShop"
         list={ListOrder}
         edit={ShowOrder}
         options={{ label: "Orders" }}
@@ -116,7 +120,7 @@ export default function Home() {
       />
 
       <Resource
-        name="ordersKiotAdmin"
+        name="ordersKiotShop"
         list={ListOrdersKiot}
         edit={ShowOrdersKiot}
         options={{ label: "OrdersKiot" }}
@@ -124,11 +128,19 @@ export default function Home() {
       />
 
       <Resource
-        name="return-orders"
+        name="transaction-shopsForShop"
+        list={ListShopTrangsaction}
+        edit={ShowShopTransaction}
+        options={{ label: "Transaction" }}
+        icon={AddBusinessIcon}
+      />
+      
+      <Resource
+        name="return-ordersForShop"
         list={ListReturnOrder}
         edit={ShowReturnOrder}
         icon={AssignmentReturnIcon}
-      />
+      /> 
 
       <CustomRoutes>
         <Route path="/profile" element={<Profile />} />

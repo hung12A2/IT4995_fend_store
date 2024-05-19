@@ -3,6 +3,8 @@
 import { Button } from "@/components/ui/button";
 import {
   BooleanField,
+  BooleanInput,
+  Create,
   Datagrid,
   DateField,
   Edit,
@@ -10,15 +12,21 @@ import {
   EmailField,
   FilterForm,
   FunctionField,
+  ImageField,
+  ImageInput,
   List,
   NumberField,
+  NumberInput,
   ReferenceField,
+  ReferenceInput,
   RichTextField,
+  SelectInput,
   Show,
   SimpleForm,
   TabbedShowLayout,
   TextField,
   TextInput,
+  useDataProvider,
   useGetIdentity,
   useRefresh,
 } from "react-admin";
@@ -33,10 +41,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import axios from "axios";
+import axios from "../AxiosCustom/custome_Axios";
 import { BASE_URL } from "@/api/constant";
-import { useToast } from "@/components/ui/use-toast";
+import { toast, useToast } from "@/components/ui/use-toast";
 import { Label } from "@mui/icons-material";
+import { RichTextInput } from "ra-input-rich-text";
+import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Form } from "react-hook-form";
 
 const postFilters = [
   <TextInput key={"id"} label="id" source="where.id.like" alwaysOn={true} />,
@@ -108,259 +120,333 @@ export const ListRequestProducts = (props: any) => {
           }}
         />
         <EditButton label="Detail" />
-
-        <FunctionField
-          render={(record: any) => {
-            const { id, status } = record;
-            if (status === "pending") {
-              return (
-                <div className=" flex flex-col gap-y-4">
-                  <AlertDialog>
-                    <AlertDialogTrigger>
-                      <div className="bg-green-300 hover:bg-green-400 hover:cursor-grab px-4 py-2 rounded-md">
-                        Accepted
-                      </div>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogDescription>
-                          Are you sure you want accepted this request ?
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={async () => {
-                            const dataFetch = await axios
-                              .post(
-                                `${BASE_URL}request-create-products/accepted/${id}`,
-                                {},
-                                {
-                                  headers: {
-                                    Authorization: `Bearer ${data?.token}`,
-                                  },
-                                }
-                              )
-                              .then((res) => res.data)
-                              .catch((e) => console.log(e));
-                            console.log(dataFetch);
-
-                            if (dataFetch)
-                              toast({
-                                title: "Accepted success",
-                              });
-
-                            refresh();
-                          }}
-                        >
-                          YES
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                  <AlertDialog>
-                    <AlertDialogTrigger>
-                      <div className="bg-red-300 hover:bg-red-400 hover:cursor-grab px-4 py-2 rounded-md">
-                        Rejected
-                      </div>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogDescription>
-                          Are you sure you want reject this request ?
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={async () => {
-                            const dataFetch = await axios
-                              .post(
-                                `${BASE_URL}request-create-products/rejected/${id}`,
-                                {},
-                                {
-                                  headers: {
-                                    Authorization: `Bearer ${data?.token}`,
-                                  },
-                                }
-                              )
-                              .then((res) => res.data)
-                              .catch((e) => console.log(e));
-                            console.log(dataFetch);
-
-                            if (dataFetch)
-                              toast({
-                                title: "Reject success",
-                              });
-
-                            refresh();
-                          }}
-                        >
-                          YES
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
-              );
-            } else {
-              return <></>;
-            }
-          }}
-        />
       </Datagrid>
     </List>
   );
 };
 
+export const CreateRequestProducts = (props: any) => {
+  const [listCate, setListCate] = useState<any>([]);
+  const dataProvider = useDataProvider();
+
+  useEffect(() => {
+    async function fetchData() {
+      let dataReturnCate: any = await axios
+        .get("categories")
+        .then((res) => res)
+        .catch((e) => console.log(e));
+
+      dataReturnCate = dataReturnCate?.map((item: any) => {
+        return {
+          cateName: item.cateName,
+          id: item.id,
+        };
+      });
+
+      setListCate(dataReturnCate);
+    }
+
+    fetchData();
+  }, [dataProvider]);
+
+  return (
+    <Create>
+      <SimpleForm
+        onSubmit={(data: any) => {
+          let formData = new FormData();
+          if (!data.image) {
+            toast({
+              title: "Please upload image",
+            });
+
+            return;
+          }
+          data.image.forEach((item: any) => {
+            if (item.rawFile) {
+              formData.append("images", item.rawFile);
+            } else {
+              item = {
+                url: item.src,
+                filename: item.filename,
+              };
+              formData.append("oldImages[]", JSON.stringify(item));
+            }
+          });
+
+          if (data.isKiotProduct == true && !data.idOfKiot) {
+            toast({
+              title: "you dont have Kiot",
+            });
+
+            return;
+          }
+          formData.append("isOnlineProduct", data.isOnlineProduct);
+          formData.append("isKiotProduct", data.isKiotProduct);
+          formData.append("idOfKiot", data.idOfKiot);
+          formData.append("name", data.name);
+          formData.append("price", data.price);
+          formData.append("countInStock", data.countInStock);
+          formData.append("isBestSeller", data.isBestSeller);
+          formData.append("weight", data.weight);
+          formData.append(
+            "dimension",
+            `${data.length}|${data.width}|${data.height}`
+          );
+          formData.append("productDescription", data.productDescription);
+          formData.append("productDetails", data.productDetails);
+
+          axios
+            .post(
+              `request-create-products/create/category/${data.idOfCategory}`,
+              formData,
+              {
+                headers: {
+                  "Content-Type": "multipart/form-data",
+                },
+              }
+            )
+            .then((res: any) => {
+              if (res.code == 200) {
+                toast({
+                  title: "Create Success",
+                });
+              } else {
+                toast({
+                  title: "Create Fail",
+                });
+              }
+            })
+            .catch((e) => console.log(e));
+        }}
+      >
+        <ImageInput isRequired source="image" label="Image" multiple>
+          <ImageField source="src" title="title" />
+        </ImageInput>
+        <div className="grid grid-cols-2 gap-x-4 gap-y-4 mb-12 w-full">
+          <div className="flex flex-row">
+            <BooleanInput source="isOnlineProduct" label="Online Product" />
+            <BooleanInput source="isKiotProduct" label="Kiot Product" />
+          </div>
+          <TextInput isRequired source="name" label="name" />
+
+          <TextInput
+            isRequired
+            source="productDescription"
+            label="productDescription"
+          />
+
+          <RichTextInput
+            isRequired
+            source="productDetails"
+            label="productDetails"
+          />
+
+          <NumberInput isRequired source="price" label="price" />
+
+          <NumberInput isRequired source="countInStock" label="countInStock" />
+
+          <SelectInput
+            source="idOfCategory"
+            label="cateName"
+            optionText="cateName"
+            optionValue="id"
+            choices={listCate}
+          />
+
+          <NumberInput source="weight" label="Weight (kg)" />
+
+          <NumberInput source="length" label="Length (cm)" />
+          <NumberInput source="width" label="Width (cm)" />
+          <NumberInput source="height" label="Height (cm)" />
+        </div>
+      </SimpleForm>
+    </Create>
+  );
+};
+
 export const ShowRequest = (props: any) => {
+  const params = useParams();
+  const id = params.id;
+  const [requesData, setRequestData] = useState<any>({});
+  const [listCate, setListCate] = useState<any>([]);
+  const dataProvider = useDataProvider();
+
+  useEffect(() => {
+    async function fetchData() {
+      let dataReturn = await dataProvider
+        .getOne("request-create-products-for-shop", { id })
+        .then((res) => res.data)
+        .catch((e) => console.log(e));
+
+      let dataReturnCate: any = await axios
+        .get("categories")
+        .then((res) => res)
+        .catch((e) => console.log(e));
+
+      dataReturnCate = dataReturnCate?.map((item: any) => {
+        return {
+          cateName: item.cateName,
+          id: item.id,
+        };
+      });
+
+      setListCate(dataReturnCate);
+
+      let img = dataReturn?.image || [];
+      img = img.map((item: any) => {
+        return {
+          src: item.url,
+          filename: item.filename,
+        };
+      });
+
+      let dimensions = dataReturn?.dimension;
+      let length = dimensions.split("|")[0];
+      let width = dimensions.split("|")[1];
+      let height = dimensions.split("|")[2];
+
+      dataReturn.image = img;
+      dataReturn.length = length;
+      dataReturn.width = width;
+      dataReturn.height = height;
+      setRequestData(dataReturn);
+
+      console.log(dataReturn);
+    }
+
+    fetchData();
+  }, [id, dataProvider]);
+
   return (
     <Show>
       <TabbedShowLayout>
         <TabbedShowLayout.Tab label="Products Detail">
-          <FunctionField
-            source="avatar"
-            label=""
-            render={(record: any) => {
-              const images = record?.image || [];
-              return (
-                <div className="flex flex-col gap-y-4">
-                  <div> Images </div>
-                  <div className="grid grid-cols-4 gap-4">
-                    {images.map((image: any, index: number) => {
-                      return (
-                        <div
-                          key={index}
-                          className={`flex flex-col ${
-                            index == 0 ? "" : "border-l-[1px]"
-                          }  border-gray-300 justify-center`}
-                        >
-                          <img src={image.url} className="w-full"></img>
-                        </div>
-                      );
-                    })}
+          <Edit>
+            <SimpleForm
+              defaultValues={requesData}
+              onSubmit={(data: any) => {
+                let formData = new FormData();
+                console.log(data.image);
+                data.image.forEach((item: any) => {
+                  if (item.rawFile) {
+                    formData.append("images", item.rawFile);
+                  } else {
+                    item = {
+                      url: item.src,
+                      filename: item.filename,
+                    };
+                    formData.append("oldImages[]", JSON.stringify(item));
+                  }
+                });
+
+                if (data.isKiotProduct == true && !data.idOfKiot) {
+                  toast({
+                    title: "you dont have Kiot",
+                  });
+
+                  return;
+                }
+                formData.append("isOnlineProduct", data.isOnlineProduct);
+                formData.append("isKiotProduct", data.isKiotProduct);
+                formData.append("idOfKiot", data.idOfKiot);
+                formData.append("name", data.name);
+                formData.append("price", data.price);
+                formData.append("countInStock", data.countInStock);
+                formData.append("isBestSeller", data.isBestSeller);
+                formData.append("weight", data.weight);
+                formData.append(
+                  "dimension",
+                  `${data.length}|${data.width}|${data.height}`
+                );
+                formData.append("productDescription", data.productDescription);
+                formData.append("productDetails", data.productDetails);
+
+                axios
+                  .post(
+                    `request-create-products/update/category/${data.idOfCategory}/${data.id}`,
+                    formData,
+                    {
+                      headers: {
+                        "Content-Type": "multipart/form-data",
+                      },
+                    }
+                  )
+                  .then((res: any) => {
+                    if (res.code == 200) {
+                      toast({
+                        title: "Update Success",
+                      });
+                    } else {
+                      toast({
+                        title: "Update Fail",
+                      });
+                    }
+                  })
+                  .catch((e) => console.log(e));
+              }}
+            >
+              <ImageInput source="image" label="Image" multiple>
+                <ImageField source="src" title="title" />
+              </ImageInput>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-4 mb-12 w-full">
+                <TextInput source="idOfShop" label="Shop Id" />
+
+                <div className="flex flex-row">
+                  <BooleanInput
+                    source="isOnlineProduct"
+                    label="Online Product"
+                  />
+                  <BooleanInput source="isKiotProduct" label="Kiot Product" />
+                </div>
+                <TextInput source="name" label="name" />
+
+                <TextInput
+                  source="productDescription"
+                  label="productDescription"
+                />
+
+                <RichTextInput source="productDetails" label="productDetails" />
+
+                <NumberInput source="price" label="Shop name" />
+
+                <NumberInput source="countInStock" label="Shop name" />
+
+                <TextInput source="status" label="Status" disabled={true} />
+
+                <SelectInput
+                  source="idOfCategory"
+                  label="cateName"
+                  optionText="cateName"
+                  optionValue="id"
+                  choices={listCate}
+                />
+
+                <NumberInput source="weight" label="Weight (kg)" />
+
+                <NumberInput source="length" label="Length (cm)" />
+                <NumberInput source="width" label="Width (cm)" />
+                <NumberInput source="height" label="Height (cm)" />
+
+                <TextInput source="createdBy" label="Created By" disabled />
+
+                <TextInput source="updatedBy" label="Updated By" disabled />
+
+                <div className="">
+                  <div className="my-2">createdAt</div>
+                  <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
+                    <DateField source="createdAt" label="Shop name" showTime />
                   </div>
                 </div>
-              );
-            }}
-          />
-          <div className="grid grid-cols-2 gap-x-4 gap-y-4 mb-12">
-            <div className="">
-              <div className="my-2">idOfCategory</div>
-              <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
-                <TextField source="idOfCategory" label="Shop name" />
-              </div>
-            </div>
-            <div className="">
-              <div className="my-2">idOfShop</div>
-              <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
-                <TextField source="idOfShop" label="Shop name" />
-              </div>
-            </div>
-            <div className="">
-              <div className="my-2">OnlineProduct</div>
-              <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
-                <BooleanField source="isOnlineProduct" label="Shop name" />
-              </div>
-            </div>
-            <div className="">
-              <div className="my-2">KiotProduct</div>
-              <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
-                <BooleanField source="isKiotProduct" label="Shop name" />
-              </div>
-            </div>
-            <div className="">
-              <div className="my-2">productDescription</div>
-              <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
-                <TextField source="productDescription" label="Shop name" />
-              </div>
-            </div>
-            <div className="">
-              <div className="my-2">productDetails</div>
-              <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
-                <RichTextField source="productDetails" label="Shop name" />
-              </div>
-            </div>
-            <div className="">
-              <div className="my-2">price</div>
-              <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
-                <NumberField source="price"  label="Shop name" />
-              </div>
-            </div>
-            <div className="">
-              <div className="my-2">countInStock</div>
-              <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
-                <RichTextField source="countInStock" label="Shop name" />
-              </div>
-            </div>
-            <div className="">
-              <div className="my-2">status</div>
-              <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
-                <RichTextField source="status" label="Shop name" />
-              </div>
-            </div>
-            <div className="">
-              <div className="my-2">cateName</div>
-              <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
-                <RichTextField source="cateName" label="Shop name" />
-              </div>
-            </div>
-            <div className="">
-              <div className="my-2">weight</div>
-              <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
-                <FunctionField
-                  source="weight"
-                  label="Shop name"
-                  render={(record: any) => {
-                    return <div>{record.weight} kg</div>;
-                  }}
-                />
-              </div>
-            </div>
-            <div className="">
-              <div className="my-2">diemension</div>
-              <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
-                <FunctionField
-                  source="diemension"
-                  label="Shop name"
-                  render={(record: any) => {
-                    const dimension = record.dimension;
-                    const length = dimension.split("|")[0];
-                    const width = dimension.split("|")[1];
-                    const height = dimension.split("|")[2];
-                    return (
-                      <div>{`length:${length}cm - width:${width}cm - height:${height}cm`}</div>
-                    );
-                  }}
-                />
-              </div>
-            </div>
-            <div className="">
-              <div className="my-2">createdBy</div>
-              <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
-                <RichTextField source="createdBy" label="Shop name" />
-              </div>
-            </div>
-            <div className="">
-              <div className="my-2">updatedBy</div>
-              <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
-                <RichTextField source="updatedBy" label="Shop name" />
-              </div>
-            </div>
-            <div className="">
-              <div className="my-2">createdAt</div>
-              <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
-                <DateField source="createdAt" label="Shop name" showTime />
-              </div>
-            </div>
 
-            <div className="">
-              <div className="my-2">updatedAt</div>
-              <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
-                <DateField source="updatedAt" label="Shop name" showTime />
+                <div className="">
+                  <div className="my-2">updatedAt</div>
+                  <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
+                    <DateField source="updatedAt" label="Shop name" showTime />
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            </SimpleForm>
+          </Edit>
         </TabbedShowLayout.Tab>
         <TabbedShowLayout.Tab className="mb-8" label="Shop Info">
           <ReferenceField source="idOfShop" reference="stores" link={false}>

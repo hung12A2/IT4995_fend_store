@@ -42,6 +42,7 @@ import { FileInput } from "lucide-react";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { imageConfigDefault } from "next/dist/shared/lib/image-config";
+import { Form } from "react-hook-form";
 
 const postFilters = [
   <TextInput key={"id"} label="id" source="where.id.like" alwaysOn={true} />,
@@ -151,88 +152,61 @@ export const EditCategories = (props: any) => {
   const { toast } = useToast();
 
   return (
-    <Edit>
-      <SimpleForm
-        onSubmit={async (data: any) => {
-          let formData = new FormData();
-          data.image = data.image ? data.image : [];
-          console.log(data);
-          formData.append("cateName", data.cateName);
-          formData.append("description", data.description);
-          data.image.forEach((file: any) => {
-            formData.append("image", file.rawFile);
-          });
+    <Show>
+      <TabbedShowLayout>
+        <TabbedShowLayout.Tab label="Summary">
+          <div className="">
+            <div className="mt-4 w-full"> List Category Images</div>
+            <FunctionField
+              source="image"
+              render={(record: any) => {
+                const url = record?.image?.url;
+                return <img className="w-24 h-24" src={url}></img>;
+              }}
+            ></FunctionField>
+          </div>
+          <div className="grid grid-cols-2 gap-x-4 gap-y-4 mb-12 w-full mt-4">
+            <div className="">
+              <div className="my-2">Created By</div>
+              <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
+                <TextField source="createdBy" />
+              </div>
+            </div>
+            <div className="">
+              <div className="my-2">Updated By</div>
+              <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
+                <TextField source="updatedBy" />
+              </div>
+            </div>
+            <div className="">
+              <div className="my-2">Created At</div>
+              <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
+                <DateField source="createdAt" showTime />
+              </div>
+            </div>
+            <div className="">
+              <div className="my-2">Updated At</div>
+              <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
+                <DateField source="updatedAt" showTime />
+              </div>
+            </div>
 
-          const res = await axios
-            .patch(`${BASE_URL}categories/${id}`, formData, {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-            })
-            .then((res) => res.data)
-            .catch((e) => console.log(e));
+            <div className="">
+              <div className="my-2">CateName</div>
+              <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
+                <TextField source="cateName" showTime />
+              </div>
+            </div>
 
-          if (res.id) {
-            toast({
-              title: "Update Category Success",
-            });
-          } else {
-            toast({
-              title: "Update Category Fail",
-            });
-          }
-        }}
-      >
-        <div className="">
-          <div className="mt-4 w-full"> List Category Images</div>
-          <FunctionField
-            source="image"
-            render={(record: any) => {
-              const url = record?.image?.url;
-              return <img className="w-24 h-24" src={url}></img>;
-            }}
-          ></FunctionField>
-        </div>
-        <div className="grid grid-cols-2 gap-x-4 gap-y-4 mb-12 w-full mt-4">
-          <div className="">
-            <div className="my-2">Created By</div>
-            <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
-              <TextField source="createdBy" />
+            <div className="">
+              <div className="my-2">description</div>
+              <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
+                <TextField source="description" showTime />
+              </div>
             </div>
           </div>
-          <div className="">
-            <div className="my-2">Updated By</div>
-            <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
-              <TextField source="updatedBy" />
-            </div>
-          </div>
-          <div className="">
-            <div className="my-2">Created At</div>
-            <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
-              <DateField source="createdAt" showTime />
-            </div>
-          </div>
-          <div className="">
-            <div className="my-2">Updated At</div>
-            <div className="w-full  border-2 border-gray-200 px-4 py-2 rounded-lg">
-              <DateField source="updatedAt" showTime />
-            </div>
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-x-4 gap-y-4 mb-12 w-full">
-          <TextInput source="cateName" required={true} />
-          <TextInput source="description" />
-        </div>
-
-        <ImageInput
-          source="image"
-          label="New Category Image"
-          accept="image/*"
-          multiple={true} // Chỉ cho phép một ảnh
-        >
-          <ImageField source="src" title="title" />
-        </ImageInput>
-      </SimpleForm>
-    </Edit>
+        </TabbedShowLayout.Tab>
+      </TabbedShowLayout>
+    </Show>
   );
 };
