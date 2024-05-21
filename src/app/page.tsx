@@ -54,6 +54,9 @@ import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
 import ProductionQuantityLimitsOutlinedIcon from "@mui/icons-material/ProductionQuantityLimitsOutlined";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import AssignmentReturnIcon from "@mui/icons-material/AssignmentReturn";
+import { ListRating, ShowRating } from "@/module/Rating/rating";
+import { ShopInfo } from "@/module/pages/ShopInfo";
+import { KiotInfo } from "@/module/pages/KiotInfo";
 
 export default function Home() {
   return (
@@ -141,9 +144,20 @@ export default function Home() {
         edit={ShowReturnOrder}
         icon={AssignmentReturnIcon}
       /> 
+      {/* ratingsForShop */}
+
+      <Resource
+        name="ratingsForShop"
+        list={ListRating}
+        edit={ShowRating}
+        icon={AssignmentReturnIcon}
+      /> 
 
       <CustomRoutes>
         <Route path="/profile" element={<Profile />} />
+        <Route path="/shopInfo" element={<ShopInfo />} />
+        <Route path="/kiotInfo" element={<KiotInfo />} />
+
       </CustomRoutes>
 
       {/* <CustomRoutes noLayout={true}>

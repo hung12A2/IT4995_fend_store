@@ -39,7 +39,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { authProvider } from "@/provider/authProvider";
 import { useRedirect } from "react-admin";
 
-export const Profile = () => {
+export const KiotInfo = () => {
   const formContext = useForm({});
   const { handleSubmit } = formContext;
   const [rerender, setRerender] = useState(false);
@@ -47,17 +47,13 @@ export const Profile = () => {
   const token: any = data?.token;
   const [user, setUser] = useState<any>();
   useEffect(() => {
-    async function fetchData() {
-      await axios
-        .get(`/whoAmI`)
-        .then((res) => {
-          console.log(res);
-          setUser(res);
-        })
-        .catch((e) => console.log(e));
-    }
-
-    fetchData();
+    axios
+      .get(`/whoAmI`)
+      .then((res) => {
+        console.log(res);
+        setUser(res);
+      })
+      .catch((e) => console.log(e));
   }, [rerender]);
   const [open, setOpen] = useState(false);
   const [openFormChangePass, setOpenFormChangePass] = useState(false);

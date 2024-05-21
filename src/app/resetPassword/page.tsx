@@ -1,7 +1,7 @@
 "use client";
 
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { EmailField, PasswordField } from "../../module/base/fieldBase";
 import { useForm, FormProvider } from "react-hook-form";
@@ -9,6 +9,14 @@ import axios from "../../module/AxiosCustom/custome_Axios";
 import { useToast } from "@/components/ui/use-toast";
 
 const EnterNewPass = () => {
+  return (
+    <Suspense>
+      <EnterNewPass2 />
+    </Suspense>
+  );
+};
+
+const EnterNewPass2 = () => {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const formContext = useForm({});
@@ -19,7 +27,7 @@ const EnterNewPass = () => {
   const onSubmit = async (data: any) => {
     const { newPassword } = data;
     const dataFetch: any = await axios
-      .post("/resetPassword/admin", { newPassword, token })
+      .post("/resetPassword/customer", { newPassword, token })
       .then((res) => res)
       .catch((e) => console.log(e));
 

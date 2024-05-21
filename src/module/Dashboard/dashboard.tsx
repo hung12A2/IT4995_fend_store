@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable @next/next/no-img-element */
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import { useEffect, useState } from "react";
@@ -29,10 +30,12 @@ function formatDateTime(dateTimeString: any) {
 export const CustomDash = () => {
   const [data, setData] = useState([]);
   const [dataKiot, setDataKiot] = useState([]);
-  const [ListNewStores, setListNewStores] = useState([]);
-  const [listNewUser, setListNewUser] = useState([]);
-  const [listNewProducts, setListNewProducts] = useState([]);
-  const [listNewRequestShops, setListNewRequestShops] = useState([]);
+  const [revenue, setRevenue] = useState(0);
+  const [transactions, setTransactions] = useState([]);
+  const [ListOrders, setListOrders] = useState([]);
+  const [ListOrdersKiot, setListOrdersKiot] = useState([]);
+  const [ListRating, setListRating] = useState([]);
+  const [listProducts, setListproducts] = useState([]);
   const redirect = useRedirect();
   const dataProvider = useDataProvider();
 
@@ -41,9 +44,12 @@ export const CustomDash = () => {
       const newDate = new Date();
       newDate.setDate(1);
       newDate.setMonth(newDate.getMonth() - 1);
-      const data: any = await axios.get("stores", {
+
+      const dataProducts: any = await axios.get("productsForShop", {
         params: {
           filter: {
+            limit: 5,
+            order: "numberOfSold DESC",
             where: {
               createdAt: { gt: newDate },
             },
@@ -51,28 +57,72 @@ export const CustomDash = () => {
         },
       });
 
-      const dataUser: any = await axios.get("getAllUser", {
+      let dataOrders: any = await axios.get("ordersShop", {
         params: {
           filter: {
             where: {
+              status: "pending",
               createdAt: { gt: newDate },
             },
           },
         },
       });
 
-      const dataShops: any = await axios.get("request-create-shops", {
+      const listIdOrder = dataOrders.map((order: any) => order.idOfUser);
+      const ListUserORder: any =
+        (await dataProvider
+          .getMany("getAllUser", { ids: listIdOrder })
+          .then((res) => res.data)
+          .catch((e) => console.log(e))) || [];
+
+      if (ListUserORder) {
+        dataOrders = dataOrders.map((item: any) => {
+          const user = ListUserORder.find(
+            (user: any) => user.id === item.idOfUser
+          );
+          return {
+            ...item,
+            userName: user?.fullName,
+            userAvatar: user?.avatar,
+          };
+        });
+      }
+
+      let dataOrdersKiot: any = await axios.get("ordersKiotShop", {
         params: {
           filter: {
             where: {
-              status: "accepted",
+              status: "pending",
               createdAt: { gt: newDate },
             },
           },
         },
       });
 
-      let dataProducts: any = await axios.get("request-create-products", {
+      const listIdOrderKiot = dataOrdersKiot.map(
+        (order: any) => order.idOfUser
+      );
+
+      const ListUserORderKiot: any =
+        (await dataProvider
+          .getMany("getAllUser", { ids: listIdOrderKiot })
+          .then((res) => res.data)
+          .catch((e) => console.log(e))) || [];
+
+      if (ListUserORderKiot) {
+        dataOrdersKiot = dataOrdersKiot.map((item: any) => {
+          const user = ListUserORderKiot.find(
+            (user: any) => user.id === item.idOfUser
+          );
+          return {
+            ...item,
+            userName: user?.fullName,
+            userAvatar: user?.avatar,
+          };
+        });
+      }
+
+      let dataRating: any = await axios.get("ratingsForShop", {
         params: {
           filter: {
             where: {
@@ -81,40 +131,55 @@ export const CustomDash = () => {
           },
         },
       });
+      const listIdUserRating = dataRating.map((rating: any) => rating.idOfUser);
+
+      const ListUserRating: any =
+        (await dataProvider
+          .getMany("getAllUser", { ids: listIdUserRating })
+          .then((res) => res.data)
+          .catch((e) => console.log(e))) || [];
+
+      if (ListUserRating) {
+        dataRating = dataRating.map((item: any) => {
+          const user = ListUserRating.find(
+            (user: any) => user.id === item.idOfUser
+          );
+          return {
+            ...item,
+            userName: user?.fullName,
+            userAvatar: user?.avatar,
+          };
+        });
+      }
 
       let dataChart: any = await axios
-        .get("ordersAdmin/days/10")
+        .get("ordersShop/days/10")
         .then((res) => res)
         .catch((e) => console.log(e));
 
       let dataKiot: any = await axios
-        .get(`ordersKiotAdmin/days/10`)
+        .get(`ordersKiotShop/days/10`)
         .then((res) => res)
         .catch((e) => console.log(e));
 
+      let revenue: any = await axios
+        .get(`/transaction-shopsForShop/sum/10`)
+        .then((res) => res)
+        .catch((e) => console.log(e));
+
+      let transactions: any = await axios
+        .get(`/transaction-shopsForShop/days/10`)
+        .then((res) => res)
+        .catch((e) => console.log(e));
+
+      setListRating(dataRating);
+      setTransactions(transactions);
+      setRevenue(revenue);
       setDataKiot(dataKiot);
-
-      console.log(dataChart);
-
-      const listIDShop = dataProducts.map((item: any) => item.idOfShop);
-      const ListShop: any =
-        (await dataProvider
-          .getMany("stores", { ids: listIDShop })
-          .then((res) => res.data)
-          .catch((e) => console.log(e))) || [];
-
-      if (ListShop) {
-        dataProducts = dataProducts.map((item: any) => {
-          const shop = ListShop.find((shop: any) => shop.id === item.idOfShop);
-          return { ...item, shopName: shop?.name, shopAvatar: shop?.avatar };
-        });
-      }
-
       setData(dataChart);
-      setListNewStores(data);
-      setListNewUser(dataUser);
-      setListNewRequestShops(dataShops);
-      setListNewProducts(dataProducts);
+      setListOrders(dataOrders);
+      setListOrdersKiot(dataOrdersKiot);
+      setListproducts(dataProducts);
     }
 
     fetch();
@@ -136,51 +201,31 @@ export const CustomDash = () => {
             </div>
 
             <div className="px-4 py-2 flex flex-col gap-y-2 text-lg ">
-              <div className="flex justify-end">New pending create shop</div>
-              <div className="flex justify-end">
-                {listNewRequestShops?.length || 0}
-              </div>
+              <div className="flex justify-end">Revenue 10days</div>
+              <div className="flex justify-end">{revenue} dong</div>
             </div>
           </div>
           <div className="w-full mt-4  border-2 border-gray-200 rounded-lg pb-6">
-            <div className="m-4">Pending request create shop</div>
-            <div className="mt-2 border-t-2 border-gray-100">
-              {listNewRequestShops?.map((item: any) => {
-                return (
-                  <div
-                    onClick={() => {
-                      redirect(`/request-create-shops/${item.id}`);
-                    }}
-                    key={item.id}
-                    className="flex flex-row gap-y-2 justify-between hover:cursor-grab hover:bg-gray-100 p-2 rounded-lg"
-                  >
-                    <div className="flex flex-row py-2">
-                      {!item?.avatarOfUser?.url ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={`https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTy-6oqxazyyxQwrNeitM4NDATAlVycYmNjqc4H37cmA&s`}
-                          alt="shop"
-                          className="w-10 h-10 rounded-full"
-                        />
-                      ) : (
-                        <img
-                          src={item?.avatarOfUser?.url}
-                          alt="shop"
-                          className="w-10 h-10 rounded-full"
-                        />
-                      )}
-
-                      <div className="flex flex-col ml-4 text-sm">
-                        <div className="">Created By:</div>
-                        <div>{item.nameOfUser}</div>
-                      </div>
-                    </div>
-                    <div className="text-sm flex justify-center items-center flex-col">
-                      {formatDateTime(item.createdAt)}
+            <div className="m-4">Top10 Best seller</div>
+            <div className="flex flex-col gap-y-4 w-full ">
+              {listProducts.map((product: any) => (
+                <div
+                  onClick={() => redirect(`/productsForShop/${product.id}`)}
+                  className="flex flex-row justify-between	w-full border-b-2 border-gray-2 hover:bg-gray-100 px-4 rouded-lg py-2 hover:cursor-grab"
+                  key={product.id}
+                >
+                  <img
+                    src={product.image[0].url}
+                    className=" rounded-full w-12 h-12 object-cover "
+                  />
+                  <div className="flex flex-col">
+                    <div>name: {product.name}</div>
+                    <div className="flex flex-row justify-end">
+                      sold: {product.numberOfSold ? product.numberOfSold : 0}
                     </div>
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -198,53 +243,33 @@ export const CustomDash = () => {
             </div>
 
             <div className="px-4 py-2 flex flex-col gap-y-2 text-lg ">
-              <div className="flex justify-end">
-                New pending create products
-              </div>
-              <div className="flex justify-end">
-                {listNewProducts?.length || 0}
-              </div>
+              <div className="flex justify-end">New pending orders</div>
+              <div className="flex justify-end">{ListOrders?.length || 0}</div>
             </div>
           </div>
           <div className="w-full mt-4  border-2 border-gray-200 rounded-lg pb-6">
-            <div className="m-4">Pending request create shop</div>
-            <div className="mt-2 border-t-2 border-gray-100">
-              {listNewProducts?.map((item: any) => {
-                return (
-                  <div
-                    onClick={() => {
-                      redirect(`/request-create-products/${item.id}`);
-                    }}
-                    key={item.id}
-                    className="flex flex-row gap-y-2 justify-between hover:cursor-grab hover:bg-gray-100 p-2 rounded-lg"
-                  >
-                    <div className="flex flex-row py-2">
-                      {!item?.shopAvatar?.url ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={`https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTy-6oqxazyyxQwrNeitM4NDATAlVycYmNjqc4H37cmA&s`}
-                          alt="shop"
-                          className="w-10 h-10 rounded-full"
-                        />
-                      ) : (
-                        <img
-                          src={item?.avatarOfUser?.url}
-                          alt="shop"
-                          className="w-10 h-10 rounded-full"
-                        />
-                      )}
-
-                      <div className="flex flex-col ml-4 text-sm">
-                        <div className="">Created By:</div>
-                        <div>{item.shopName}</div>
-                      </div>
+            <div className="m-4">New pending orders</div>
+            <div>
+              {ListOrders.map((order: any) => (
+                <div
+                  onClick={() => redirect(`/ordersShop/${order.id}`)}
+                  className="flex flex-row justify-between	w-full border-b-2 border-gray-2 hover:bg-gray-100 px-4 rouded-lg py-2 hover:cursor-grab"
+                  key={order.id}
+                >
+                  <img
+                    src={order.userAvatar.url}
+                    className=" rounded-full w-12 h-12 object-cover "
+                  />
+                  <div className="flex flex-col">
+                    <div className="flex flex-row justify-end">
+                      created By: {order.userName}
                     </div>
-                    <div className="text-sm flex justify-center items-center flex-col">
-                      {formatDateTime(item.createdAt)}
+                    <div className="flex flex-row justify-end">
+                      time: {formatDateTime(order.createdAt)}
                     </div>
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -262,49 +287,35 @@ export const CustomDash = () => {
             </div>
 
             <div className="px-4 py-2 flex flex-col gap-y-2 text-lg ">
-              <div className="flex justify-end">New User</div>
-              <div className="flex justify-end">{listNewUser?.length || 0}</div>
+              <div className="flex justify-end">New pending orders Kiot</div>
+              <div className="flex justify-end">
+                {ListOrdersKiot?.length || 0}
+              </div>
             </div>
           </div>
           <div className="w-full mt-4  border-2 border-gray-200 rounded-lg pb-6">
-            <div className="m-4">New Users</div>
-            <div className="mt-2 border-t-2 border-gray-100">
-              {listNewUser?.map((item: any) => {
-                return (
-                  <div
-                    onClick={() => {
-                      redirect(`/getAllUser/${item.id}`);
-                    }}
-                    key={item.id}
-                    className="flex flex-row gap-y-2 justify-between hover:cursor-grab hover:bg-gray-100 p-2 rounded-lg"
-                  >
-                    <div className="flex flex-row py-2">
-                      {!item?.avatar?.url ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={`https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTy-6oqxazyyxQwrNeitM4NDATAlVycYmNjqc4H37cmA&s`}
-                          alt="shop"
-                          className="w-10 h-10 rounded-full"
-                        />
-                      ) : (
-                        <img
-                          src={item?.avatar?.url}
-                          alt="shop"
-                          className="w-10 h-10 rounded-full"
-                        />
-                      )}
-
-                      <div className="flex flex-col ml-4 text-sm">
-                        <div className="">Name:</div>
-                        <div>{item.fullName}</div>
-                      </div>
+            <div className="m-4">New pending orders Kiot</div>
+            <div>
+              {ListOrdersKiot.map((order: any) => (
+                <div
+                  onClick={() => redirect(`/ordersKiotShop/${order.id}`)}
+                  className="flex flex-row justify-between	w-full border-b-2 border-gray-2 hover:bg-gray-100 px-4 rouded-lg py-2 hover:cursor-grab"
+                  key={order.id}
+                >
+                  <img
+                    src={order.userAvatar.url}
+                    className=" rounded-full w-12 h-12 object-cover "
+                  />
+                  <div className="flex flex-col">
+                    <div className="flex flex-row justify-end">
+                      created By: {order.userName}
                     </div>
-                    <div className="text-sm flex justify-center items-center flex-col">
-                      {formatDateTime(item.createdAt)}
+                    <div className="flex flex-row justify-end">
+                      time: {formatDateTime(order.createdAt)}
                     </div>
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -322,51 +333,32 @@ export const CustomDash = () => {
             </div>
 
             <div className="px-4 py-2 flex flex-col gap-y-2 text-lg ">
-              <div className="flex justify-end">New Shop</div>
-              <div className="flex justify-end">
-                {ListNewStores?.length || 0}
-              </div>
+              <div className="flex justify-end">New Rating</div>
+              <div className="flex justify-end">{ListRating?.length || 0}</div>
             </div>
           </div>
           <div className="w-full mt-4  border-2 border-gray-200 rounded-lg pb-6">
-            <div className="m-4">New Shops</div>
-            <div className="mt-2 border-t-2 border-gray-100">
-              {ListNewStores?.map((item: any) => {
-                return (
-                  <div
-                    onClick={() => {
-                      redirect(`/stores/${item.id}`);
-                    }}
-                    key={item.id}
-                    className="flex flex-row gap-y-2 justify-between hover:cursor-grab hover:bg-gray-100 p-2 rounded-lg"
-                  >
-                    <div className="flex flex-row py-2">
-                      {!item?.avatar?.url ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={`https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTy-6oqxazyyxQwrNeitM4NDATAlVycYmNjqc4H37cmA&s`}
-                          alt="shop"
-                          className="w-10 h-10 rounded-full"
-                        />
-                      ) : (
-                        <img
-                          src={item?.avatar?.url}
-                          alt="shop"
-                          className="w-10 h-10 rounded-full"
-                        />
-                      )}
-
-                      <div className="flex flex-col ml-4 text-sm">
-                        <div className="">Shop Name:</div>
-                        <div>{item.name}</div>
-                      </div>
+            <div className="m-4">New Rating</div>
+            <div>
+              {ListRating.map((rating: any) => (
+                <div
+                  className="flex flex-row justify-between 	w-full border-b-2 border-gray-2 hover:bg-gray-100 px-4 rouded-lg py-2 hover:cursor-grab"
+                  key={rating.id}
+                >
+                  <img
+                    src={rating.userAvatar.url}
+                    className=" rounded-full w-12 h-12 object-cover"
+                  />
+                  <div className="flex flex-col justify-end">
+                    <div className="flex flex-row justify-end">
+                      {rating.comment}
                     </div>
-                    <div className="text-sm flex justify-center items-center flex-col">
-                      {formatDateTime(item.createdAt)}
+                    <div className="flex flex-row justify-end">
+                      rating: {rating.rating}
                     </div>
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -396,6 +388,26 @@ export const CustomDash = () => {
             <Legend />
             <Bar dataKey="order" fill="#8884d8" />
             <Bar dataKey="orderSuccess" fill="#82ca9d" />
+          </BarChart>
+        </div>
+      </div>
+
+      <div className=" flex flex-row">
+        <div className="w-1/2 py-4  rounded-lg border-2 border-gray-100">
+          <div className="ml-4 mt-2">Transaction in 10 days</div>
+          <BarChart
+            width={730}
+            height={250}
+            data={transactions}
+            className="mt-4"
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="revenue" fill="#8884d8" />
+            <Bar dataKey="numberTransaction" fill="#82ca9d" />
           </BarChart>
         </div>
       </div>

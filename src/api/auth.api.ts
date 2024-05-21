@@ -11,7 +11,9 @@ export const signIn = async (email: string, password: string) => {
 
   const json = await result.json();
   const token = json.token;
-  localStorage.setItem("token", JSON.stringify({ token }));
+  if (typeof window !== "undefined") {
+    localStorage.setItem("token", JSON.stringify({ token }));
+  }
 
   const user = await (
     await fetch(`${BASE_URL}/whoAmI`, {
@@ -21,7 +23,8 @@ export const signIn = async (email: string, password: string) => {
       },
     })
   ).json();
-
-  localStorage.setItem("user", JSON.stringify({ user }));
+  if (typeof window !== "undefined") {
+    localStorage.setItem("user", JSON.stringify({ user }));
+  }
   return json;
 };

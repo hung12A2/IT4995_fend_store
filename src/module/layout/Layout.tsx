@@ -28,6 +28,26 @@ const MenuItems = () => {
         <AccountCircleIcon className="mr-3" />
         <span>Profile</span>
       </div>
+      <div
+        className="px-4 py-2 border-b-2 hover:cursor-grab hover:bg-gray-100"
+        onClick={() => {
+          onClose();
+          redirect("/shopInfo");
+        }}
+      >
+        <AccountCircleIcon className="mr-3" />
+        <span>shopInfo</span>
+      </div>
+      <div
+        className="px-4 py-2 border-b-2 hover:cursor-grab hover:bg-gray-100"
+        onClick={() => {
+          onClose();
+          redirect("/kiotInfo");
+        }}
+      >
+        <AccountCircleIcon className="mr-3" />
+        <span>kiotInfo</span>
+      </div>
     </div>
   );
 };
@@ -71,6 +91,7 @@ const MyMenu = (props: any) => {
       <Menu.ResourceItem name="transaction-shopsForShop" />
       <Menu.ResourceItem name="transaction-shops" />
       <Menu.ResourceItem name="return-ordersForShop" />
+      <Menu.ResourceItem name="ratingsForShop" />      
     </Menu>
   );
 };

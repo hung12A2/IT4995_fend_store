@@ -85,6 +85,105 @@ export const ListOrder = (props: any) => {
         <TextField source="status" />
         <TextField source="paymentMethod" />
         <TextField source="requiredNote" />
+        <FunctionField
+          render={(record: any) => {
+            const { id, status } = record;
+            if (status === "active" && data?.user?.id === id) {
+              return;
+            }
+            if (status === "active") {
+              return (
+                <AlertDialog>
+                  <AlertDialogTrigger>
+                    <div className="bg-red-300 hover:bg-red-400 hover:cursor-grab px-4 py-2 rounded-md">
+                      Ban
+                    </div>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogDescription>
+                        Are you sure you want ban this user ?
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={async () => {
+                          const dataFetch = await axios
+                            .post(
+                              `${BASE_URL}admins/banned/${id}`,
+                              {},
+                              {
+                                headers: {
+                                  Authorization: `Bearer ${data?.token}`,
+                                },
+                              }
+                            )
+                            .then((res) => res.data)
+                            .catch((e) => console.log(e));
+
+                          if (dataFetch.code == 200)
+                            toast({
+                              title: "Ban success",
+                            });
+
+                          refresh();
+                        }}
+                      >
+                        YES
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              );
+            } else {
+              return (
+                <AlertDialog>
+                  <AlertDialogTrigger>
+                    <div className="bg-blue-300 hover:bg-blue-400 hover:cursor-grab px-4 py-2 rounded-md">
+                      UnBan
+                    </div>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogDescription>
+                        Are you sure you want unban this user ?
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={async () => {
+                          const dataFetch = await axios
+                            .post(
+                              `${BASE_URL}admins/unbanned/${id}`,
+                              {},
+                              {
+                                headers: {
+                                  Authorization: `Bearer ${data?.token}`,
+                                },
+                              }
+                            )
+                            .then((res) => res.data)
+                            .catch((e) => console.log(e));
+
+                          if (dataFetch.code == 200)
+                            toast({
+                              title: "UnBun success",
+                            });
+
+                          refresh();
+                        }}
+                      >
+                        YES
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              );
+            }
+          }}
+        />
         <EditButton label="Details" />
       </Datagrid>
     </List>
