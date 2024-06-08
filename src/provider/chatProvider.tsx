@@ -42,7 +42,10 @@ export const ChatContext = createContext<any>({});
 
 
 export function ChatProvider ({ children }: { children: React.ReactNode }) {
-  const { user } = useAuthProvider();
+  let user: any = localStorage.getItem("user");
+  user = JSON.parse(user).user;
+
+
   const initializer = () => {
     return {};
   };
@@ -83,20 +86,20 @@ export function ChatProvider ({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     socket.emit("listConversation", {
-      idOfUser: user?.id,
+      idOfShop: user?.idOfShop,
     });
-  }, [user?.id]);
+  }, [user?.idOfShop]);
 
   useEffect(() => {
     socket.on("server-listConversation", async (data) => {
-      const listIdShop = data.map((item: any) => item.idOfShop);
-      let dataShop: any = await axios
-        .get(`stores`, {
+      const listIdUser = data.map((item: any) => item.idOfUser);
+      let dataUser: any = await axios
+        .get(`getAllUser`, {
           params: {
             filter: {
               where: {
                 id: {
-                  inq: listIdShop,
+                  inq: listIdUser,
                 },
               },
             },
@@ -108,7 +111,7 @@ export function ChatProvider ({ children }: { children: React.ReactNode }) {
       data = data.map((item: any) => {
         return {
           ...item,
-          shop: dataShop.find((shop: any) => shop.id === item.idOfShop),
+          user: dataUser.find((user: any) => user.id === item.idOfUser),
         };
       });
 
@@ -122,7 +125,7 @@ export function ChatProvider ({ children }: { children: React.ReactNode }) {
       }
 
       const listCon = listConversation?.map((item: any) => {
-        if (item.idOfShop == data.idOfShop) {
+        if (item.idOfUser == data.idOfUser) {
           item.lastMsg = data.content;
 
           return item;

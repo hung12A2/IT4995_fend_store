@@ -65,14 +65,14 @@ import { ChatProvider } from "@/provider/chatProvider";
 
 export default function Home() {
   return (
-    <Admin
-      loginPage={Login}
-      authProvider={authProvider}
-      dataProvider={dataProvider}
-      layout={MainLayout}
-      dashboard={CustomDash}
-    >
-      
+    <ChatProvider>
+      <Admin
+        loginPage={Login}
+        authProvider={authProvider}
+        dataProvider={dataProvider}
+        layout={MainLayout}
+        dashboard={CustomDash}
+      >
         <Resource
           name="categories"
           list={ListCategories}
@@ -156,8 +156,9 @@ export default function Home() {
           <Route path="/kiotInfo" element={<KiotInfo />} />
         </CustomRoutes>
 
-      {/* <CustomRoutes noLayout={true}>
+        {/* <CustomRoutes noLayout={true}>
       </CustomRoutes> */}
-    </Admin>
+      </Admin>
+    </ChatProvider>
   );
 }

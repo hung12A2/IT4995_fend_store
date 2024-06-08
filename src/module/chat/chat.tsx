@@ -18,7 +18,6 @@ export default function Chat() {
   const [openFormChat, setOpenFormChat] = useState(false);
   const { listConversation, listMsg, selectedConversation, setSelectedConversation} = useChatContext();
   const [inputMsg, setInputMsg] = useState("");
-  const { user } = useAuthProvider();
 
   const inputRef = useRef(null);
 
@@ -55,7 +54,7 @@ export default function Chat() {
         <div className="flex w-full flex-row">
           <div className="w-[223px]">
             {listConversation?.map((item: any) => {
-              const shop = item?.shop;
+              const user = item?.user;
               const formattedDate = format(parseISO(item?.createdAt), "dd/MM");
 
               return (
@@ -76,13 +75,13 @@ export default function Chat() {
                   key={item?.id}
                 >
                   <Avatar className="w-8 h-8">
-                    <AvatarImage src={shop?.avatar?.url} />
+                    <AvatarImage src={user?.avatar?.url} />
                     <AvatarFallback>HN</AvatarFallback>
                   </Avatar>
                   <div>
                     <div className="flex flex-row gap-x-2">
-                      <div className="font-medium">
-                        {formatString(shop?.name, 10)}
+                      <div className="font-medium w-[120px]">
+                        {formatString(user?.fullName || '', 10)}
                       </div>
                       <div> {formattedDate}</div>
                     </div>
@@ -98,8 +97,8 @@ export default function Chat() {
 
           <div className="bg-gray-100 flex flex-col grow h-[412px] relative">
             {selectedConversation && (
-              <div className="pl-4 w-full py-2 bg-white border-b-[1px] border-gray-200">
-                {selectedConversation?.shop?.name}
+              <div className="pl-4 w-full py-2 bg-white border-b-[1px] border-gray-200 ">
+                {selectedConversation?.user?.fullName}
               </div>
             )}
 
@@ -110,7 +109,7 @@ export default function Chat() {
                     <div
                       className={cn(
                         "flex flex-row gap-x-2",
-                        item?.idOfUser == item?.senderId
+                        item?.idOfShop == item?.senderId
                           ? "justify-end"
                           : "justify-start"
                       )}
@@ -118,8 +117,8 @@ export default function Chat() {
                     >
                       <div
                         className={cn(
-                          "px-2 py-1 bg-gray-200 rounded-lg flex flex-row gap-x-[6px]",
-                          item?.idOfUser == item?.senderId ? "bg-cyan-200" : ""
+                          "max-w-[290px] px-2 py-1 bg-gray-200 rounded-lg flex flex-row gap-x-[6px]",
+                          item?.idOfShop == item?.senderId ? "bg-cyan-200" : ""
                         )}
                       >
                         {item?.content}
@@ -171,8 +170,8 @@ export default function Chat() {
                     idOfUser: selectedConversation?.idOfUser,
                     idOfShop: selectedConversation?.idOfShop,
                     content: inputMsg,
-                    senderId: selectedConversation?.idOfUser,
-                    targetId: selectedConversation?.idOfShop,
+                    senderId: selectedConversation?.idOfShop,
+                    targetId: selectedConversation?.idOfUser,
                   });
                 }
               }}

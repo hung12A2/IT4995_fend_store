@@ -42,6 +42,7 @@ import axios from "../AxiosCustom/custome_Axios";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+import Chat from "../chat/chat";
 
 const postFilters = [
   <TextInput key={"id"} label="id" source="where.id.like" alwaysOn={true} />,
@@ -71,183 +72,186 @@ export const ListEmployee = (props: any) => {
   const { toast } = useToast();
   const refresh = useRefresh();
   return (
-    <List>
-      <FilterForm filters={postFilters}></FilterForm>
-      <Datagrid bulkActionButtons={false}>
-        <TextField source="id" />
-        <TextField source="idOfShop" />
-        <TextField source="name" />
-        <FunctionField
-          source="permissions"
-          label="Permissions"
-          render={(record: any) => {
-            return (
-              <div className="flex flex-col gap-y-2 w-fit">
-                {record.permissions.split("|").map((item: any) => (
-                  <div
-                    className="bg-sky-200 p-2 rounded-lg w-fit hover:cursor-grab"
-                    key={item}
-                  >
-                    {item}
+    <>
+      <Chat />
+      <List>
+        <FilterForm filters={postFilters}></FilterForm>
+        <Datagrid bulkActionButtons={false}>
+          <TextField source="id" />
+          <TextField source="idOfShop" />
+          <TextField source="name" />
+          <FunctionField
+            source="permissions"
+            label="Permissions"
+            render={(record: any) => {
+              return (
+                <div className="flex flex-col gap-y-2 w-fit">
+                  {record.permissions.split("|").map((item: any) => (
+                    <div
+                      className="bg-sky-200 p-2 rounded-lg w-fit hover:cursor-grab"
+                      key={item}
+                    >
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              );
+            }}
+          />
+          <EmailField source="email" />
+          <TextField source="phoneNumber" />
+          <FunctionField
+            className="w-1/6"
+            label="Avatar"
+            render={(record: any) => {
+              const url = record?.avatar?.url;
+              // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
+              if (url)
+                return (
+                  // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text, react/jsx-no-undef
+                  <img src={url} className="w-24 h-24"></img>
+                );
+              else
+                return (
+                  // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
+                  <img
+                    className="w-24 h-24"
+                    src={`https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTy-6oqxazyyxQwrNeitM4NDATAlVycYmNjqc4H37cmA&s`}
+                  ></img>
+                );
+            }}
+          />
+
+          <FunctionField
+            source="status"
+            render={(record: any) => {
+              const { status } = record;
+              if (status === "active")
+                return (
+                  <div className="flex flex-row items-center">
+                    <div className="w-2 h-2 bg-green-300 rounded-full mr-2"></div>
+                    <div>Active</div>
                   </div>
-                ))}
-              </div>
-            );
-          }}
-        />
-        <EmailField source="email" />
-        <TextField source="phoneNumber" />
-        <FunctionField
-          className="w-1/6"
-          label="Avatar"
-          render={(record: any) => {
-            const url = record?.avatar?.url;
-            // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
-            if (url)
-              return (
-                // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text, react/jsx-no-undef
-                <img src={url} className="w-24 h-24"></img>
-              );
-            else
-              return (
-                // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
-                <img
-                  className="w-24 h-24"
-                  src={`https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTy-6oqxazyyxQwrNeitM4NDATAlVycYmNjqc4H37cmA&s`}
-                ></img>
-              );
-          }}
-        />
+                );
+              else if (status === "banned") {
+                return (
+                  <div className="flex flex-row items-center">
+                    <div className="w-2 h-2 bg-red-400 rounded-full mr-2"></div>
+                    <div>Banned</div>
+                  </div>
+                );
+              } else {
+                return (
+                  <div className="flex flex-row items-center">
+                    <div className="w-2 h-2 bg-yellow-400 rounded-full mr-2"></div>
+                    <div>inActive</div>
+                  </div>
+                );
+              }
+            }}
+          />
+          <DateField source="createdAt" showTime />
+          <EditButton label="Detail" />
+          <FunctionField
+            render={(record: any) => {
+              const { id, status } = record;
+              if (status === "active") {
+                return (
+                  <AlertDialog>
+                    <AlertDialogTrigger>
+                      <div className="bg-red-300 hover:bg-red-400 hover:cursor-grab px-4 py-2 rounded-md">
+                        InActive
+                      </div>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogDescription>
+                          Are you sure you want inActive this user ?
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={async () => {
+                            const dataFetch: any = await axios
+                              .post(
+                                `${BASE_URL}employees/inActive/${id}`,
+                                {},
+                                {
+                                  headers: {
+                                    Authorization: `Bearer ${data?.token}`,
+                                  },
+                                }
+                              )
+                              .then((res) => res)
+                              .catch((e) => console.log(e));
 
-        <FunctionField
-          source="status"
-          render={(record: any) => {
-            const { status } = record;
-            if (status === "active")
-              return (
-                <div className="flex flex-row items-center">
-                  <div className="w-2 h-2 bg-green-300 rounded-full mr-2"></div>
-                  <div>Active</div>
-                </div>
-              );
-            else if (status === "banned") {
-              return (
-                <div className="flex flex-row items-center">
-                  <div className="w-2 h-2 bg-red-400 rounded-full mr-2"></div>
-                  <div>Banned</div>
-                </div>
-              );
-            } else {
-              return (
-                <div className="flex flex-row items-center">
-                  <div className="w-2 h-2 bg-yellow-400 rounded-full mr-2"></div>
-                  <div>inActive</div>
-                </div>
-              );
-            }
-          }}
-        />
-        <DateField source="createdAt" showTime />
-        <EditButton label="Detail" />
-        <FunctionField
-          render={(record: any) => {
-            const { id, status } = record;
-            if (status === "active") {
-              return (
-                <AlertDialog>
-                  <AlertDialogTrigger>
-                    <div className="bg-red-300 hover:bg-red-400 hover:cursor-grab px-4 py-2 rounded-md">
-                      InActive
-                    </div>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogDescription>
-                        Are you sure you want inActive this user ?
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={async () => {
-                          const dataFetch: any = await axios
-                            .post(
-                              `${BASE_URL}employees/inActive/${id}`,
-                              {},
-                              {
-                                headers: {
-                                  Authorization: `Bearer ${data?.token}`,
-                                },
-                              }
-                            )
-                            .then((res) => res)
-                            .catch((e) => console.log(e));
+                            console.log(dataFetch);
+                            if (dataFetch.code == 200)
+                              toast({
+                                title: "Ban success",
+                              });
 
-                          console.log(dataFetch);
-                          if (dataFetch.code == 200)
-                            toast({
-                              title: "Ban success",
-                            });
+                            refresh();
+                          }}
+                        >
+                          YES
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                );
+              } else {
+                return (
+                  <AlertDialog>
+                    <AlertDialogTrigger>
+                      <div className="bg-blue-300 hover:bg-blue-400 hover:cursor-grab px-4 py-2 rounded-md">
+                        Active
+                      </div>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogDescription>
+                          Are you sure you want Active this user ?
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={async () => {
+                            const dataFetch = await axios
+                              .post(
+                                `${BASE_URL}employees/active/${id}`,
+                                {},
+                                {
+                                  headers: {
+                                    Authorization: `Bearer ${data?.token}`,
+                                  },
+                                }
+                              )
+                              .then((res) => res.data)
+                              .catch((e) => console.log(e));
 
-                          refresh();
-                        }}
-                      >
-                        YES
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              );
-            } else {
-              return (
-                <AlertDialog>
-                  <AlertDialogTrigger>
-                    <div className="bg-blue-300 hover:bg-blue-400 hover:cursor-grab px-4 py-2 rounded-md">
-                      Active
-                    </div>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogDescription>
-                        Are you sure you want Active this user ?
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={async () => {
-                          const dataFetch = await axios
-                            .post(
-                              `${BASE_URL}employees/active/${id}`,
-                              {},
-                              {
-                                headers: {
-                                  Authorization: `Bearer ${data?.token}`,
-                                },
-                              }
-                            )
-                            .then((res) => res.data)
-                            .catch((e) => console.log(e));
+                            if (dataFetch.code == 200)
+                              toast({
+                                title: "UnBun success",
+                              });
 
-                          if (dataFetch.code == 200)
-                            toast({
-                              title: "UnBun success",
-                            });
-
-                          refresh();
-                        }}
-                      >
-                        YES
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              );
-            }
-          }}
-        />
-      </Datagrid>
-    </List>
+                            refresh();
+                          }}
+                        >
+                          YES
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                );
+              }
+            }}
+          />
+        </Datagrid>
+      </List>
+    </>
   );
 };
 
@@ -426,7 +430,7 @@ export const ShowEmployee = (props: any) => {
             .then((res) => res)
             .catch((e) => console.log(e));
 
-            console.log(dataFetch);
+          console.log(dataFetch);
 
           if (dataFetch.code == 200) {
             toast({

@@ -14,6 +14,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import Chat from "../chat/chat";
 
 function formatDateTime(dateTimeString: any) {
   const date = new Date(dateTimeString);
@@ -38,10 +39,6 @@ export const CustomDash = () => {
   const [listProducts, setListproducts] = useState([]);
   const redirect = useRedirect();
   const dataProvider = useDataProvider();
-
-
-  const user = useGetIdentity()?.data?.user;
-  console.log(user);
 
   useEffect(() => {
     async function fetch() {
@@ -191,6 +188,7 @@ export const CustomDash = () => {
 
   return (
     <div className="mt-12 flex flex-col px-8">
+      <Chat />
       <div className="w-full flex flex-row gap-x-4">
         <div className="flex flex-col w-1/4">
           <div className="flex flex-row justify-between rounded-lg border-2 w-full relative">
