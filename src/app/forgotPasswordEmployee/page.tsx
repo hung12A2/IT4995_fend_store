@@ -7,7 +7,7 @@ import { EmailField, PasswordField } from "../../module/base/fieldBase";
 import { useForm, FormProvider } from "react-hook-form";
 import { useToast } from "@/components/ui/use-toast";
 
-const Forgetpass = () => {
+const ForgetPassEmployee = () => {
   const router = useRouter();
   const { toast } = useToast();
   const formContext = useForm({});
@@ -17,7 +17,7 @@ const Forgetpass = () => {
   const onSubmit = async (data: any) => {
     const { email } = data;
     const dataFetch = await axios
-      .post("/forgotPassword/customer", { email })
+      .post("/forgotPassword/employee", { email })
       .then((res) => res.data)
       .catch((e) => console.log(e));
 
@@ -30,7 +30,7 @@ const Forgetpass = () => {
         <div className="container max-w-sm mx-auto flex-1 flex flex-col items-center justify-center px-2">
           <div className="bg-white px-6 py-8 rounded shadow-md text-black w-full">
             <h1 className="mb-8 text-3xl text-center font-semibold">
-              Reset Password
+              Reset Password Employee
             </h1>
             <FormProvider {...formContext}>
               <div className="mb-4">
@@ -46,7 +46,7 @@ const Forgetpass = () => {
                 onClick={handleSubmit(onSubmit)}
                 className="w-full text-center py-3 rounded bg-green-500 text-white hover:bg-green-dark focus:outline-none my-3"
               >
-                Submit 
+                Submit
               </button>
             </FormProvider>
           </div>
@@ -69,4 +69,4 @@ const Forgetpass = () => {
   );
 };
 
-export default Forgetpass;
+export default ForgetPassEmployee;

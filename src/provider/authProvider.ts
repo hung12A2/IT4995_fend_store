@@ -4,11 +4,12 @@ import { signIn } from "@/api/auth.api";
 export type Credentials = {
   email: string;
   password: string;
+  role: string;
 };
 
-const login = async ({ email, password }: Credentials): Promise<boolean> => {
+const login = async ({ email, password, role ='customer' }: Credentials): Promise<boolean> => {
   try {
-    await signIn(email, password);
+    await signIn(email, password, role);
     return true;
   } catch (error) {
     console.log("err", error);

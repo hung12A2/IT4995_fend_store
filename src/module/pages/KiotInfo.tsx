@@ -4,8 +4,10 @@ import {
   DateField,
   DateInput,
   Form,
+  SelectInput,
   TextInput,
   useGetIdentity,
+  useRefresh,
 } from "react-admin";
 import {
   DropdownMenu,
@@ -35,37 +37,61 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { DialogTrigger } from "@radix-ui/react-dialog";
-import { FormProvider, useForm } from "react-hook-form";
+import { FormProvider, set, useForm } from "react-hook-form";
 import { authProvider } from "@/provider/authProvider";
 import { useRedirect } from "react-admin";
+import { RichTextInput } from "ra-input-rich-text";
 
-export const KiotInfo = () => {
+function roundToTwoDecimalPlaces(num: number) {
+  return parseFloat(num.toFixed(2));
+}
+
+const KiotInfo = () => {
+  const { data, isLoading } = useGetIdentity();
+  const [kiotInfo, setkiotInfo] = useState<any>();
+  const user = data?.user;
   const formContext = useForm({});
   const { handleSubmit } = formContext;
   const [rerender, setRerender] = useState(false);
-  const { data, isLoading } = useGetIdentity();
-  const token: any = data?.token;
-  const [user, setUser] = useState<any>();
-  useEffect(() => {
-    axios
-      .get(`/whoAmI`)
-      .then((res) => {
-        console.log(res);
-        setUser(res);
-      })
-      .catch((e) => console.log(e));
-  }, [rerender]);
+
+  const [listProvince, setListProvince] = useState<any>([]);
+  const [listDistrict, setListDistrict] = useState<any>([]);
+  const [listDistrict2, setListDistrict2] = useState<any>([]);
+  const [listWard, setListWard] = useState<any>([]);
+  const [listWard2, setListWard2] = useState<any>([]);
+  const [seletedProvince, setSeletedProvince] = useState<any>();
+  const [seletedDistrict, setSeletedDistrict] = useState<any>();
+  const [seletedProvince2, setSeletedProvince2] = useState<any>();
+  const [seletedDistrict2, setSeletedDistrict2] = useState<any>();
+
   const [open, setOpen] = useState(false);
+  const [open2, setOpen2] = useState(false);
   const [openFormChangePass, setOpenFormChangePass] = useState(false);
   const [imgFile, setImgFile] = useState<any>();
+  const [imgFile2, setImgFile2] = useState<any>();
+  const [imgLink2, setImgLink2] = useState("");
+
   const [imgLink, setImgLink] = useState("");
   const { toast } = useToast();
 
   const redirect = useRedirect();
 
   const fileInputRef: any = useRef(null);
+  const fileInputRef2: any = useRef(null);
   const handleUploadClick = () => {
     fileInputRef.current.click();
+  };
+  const handleUploadClick2 = () => {
+    fileInputRef2.current.click();
+  };
+
+  const handleFileChange2 = (e: any) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImgFile2(file);
+      setImgLink2(URL.createObjectURL(file));
+      setOpen2(true);
+    }
   };
 
   const handleFileChange = (e: any) => {
@@ -77,6 +103,127 @@ export const KiotInfo = () => {
     }
   };
 
+  useEffect(() => {
+    async function fetchData() {
+      let datakiot: any = await axios
+        .get(`myKiotInfo`)
+        .then((res) => res)
+        .catch((e) => console.log(e));
+
+      let kiot = datakiot.kiot;
+      kiot.pickUpProvince = `${kiot.pickUpProvinceName}-${kiot.pickUpProvinceId}`;
+      kiot.pickUpDistrict = `${kiot.pickUpDistrictName}-${kiot.pickUpDistrictId}`;
+      kiot.returnProvince = `${kiot.returnProvinceName}-${kiot.returnProvinceId}`;
+      kiot.returnDistrict = `${kiot.returnDistrictName}-${kiot.returnDistrictId}`;
+      kiot.pickUpWard = `${kiot.pickUpWardName}-${kiot.pickUpWardId}`;
+      kiot.returnWard = `${kiot.returnWardName}-${kiot.returnWardId}`;
+
+      datakiot.kiot = kiot;
+
+      setkiotInfo(datakiot);
+
+      setSeletedProvince(datakiot?.kiot?.pickUpProvince);
+      setSeletedDistrict(datakiot?.kiot?.pickUpDistrict);
+      setSeletedProvince2(datakiot?.kiot?.returnProvince);
+      setSeletedDistrict2(datakiot?.kiot?.returnDistrict);
+
+      let dataProvince = await axios
+        .post(`location/province`, {})
+        .then((res) => res.data)
+        .catch((e) => console.log(e));
+
+      dataProvince = dataProvince.map((item: any) => {
+        return {
+          provinceId: `${item.provinceName}-${item.provinceId}`,
+          provinceName: item.provinceName,
+        };
+      });
+
+      setListProvince(dataProvince);
+    }
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    async function fetchData() {
+      let dataDistrict = await axios
+        .post(`location/district/${seletedProvince.split("-")[1]}`, {})
+        .then((res) => res.data)
+        .catch((e) => console.log(e));
+
+      dataDistrict = dataDistrict.map((item: any) => {
+        return {
+          districtId: `${item.districtName}-${item.districtId}`,
+          districtName: item.districtName,
+        };
+      });
+
+      setListDistrict(dataDistrict);
+    }
+
+    fetchData();
+  }, [seletedProvince]);
+
+  useEffect(() => {
+    async function fetchData() {
+      let dataDistrict = await axios
+        .post(`location/district/${seletedProvince2.split("-")[1]}`, {})
+        .then((res) => res.data)
+        .catch((e) => console.log(e));
+
+      dataDistrict = dataDistrict.map((item: any) => {
+        return {
+          districtId: `${item.districtName}-${item.districtId}`,
+          districtName: item.districtName,
+        };
+      });
+
+      setListDistrict2(dataDistrict);
+    }
+
+    fetchData();
+  }, [seletedProvince2]);
+
+  useEffect(() => {
+    async function fetchData() {
+      let dataWard = await axios
+        .post(`location/ward/${seletedDistrict.split("-")[1]}`, {})
+        .then((res) => res.data)
+        .catch((e) => console.log(e));
+
+      dataWard = dataWard.map((item: any) => {
+        return {
+          wardCode: `${item.wardName}-${item.wardCode}`,
+          wardName: item.wardName,
+        };
+      });
+      setListWard(dataWard);
+    }
+
+    fetchData();
+  }, [seletedDistrict]);
+
+  useEffect(() => {
+    async function fetchData() {
+      let dataWard = await axios
+        .post(`location/ward/${seletedDistrict2.split("-")[1]}`, {})
+        .then((res) => res.data)
+        .catch((e) => console.log(e));
+
+      dataWard = dataWard.map((item: any) => {
+        return {
+          wardCode: `${item.wardName}-${item.wardCode}`,
+          wardName: item.wardName,
+        };
+      });
+
+      setListWard2(dataWard);
+    }
+
+    fetchData();
+  }, [seletedDistrict2]);
+
   if (isLoading) return <div>Loading...</div>;
 
   return (
@@ -86,7 +233,7 @@ export const KiotInfo = () => {
           <DialogTitle>Preview Avatar</DialogTitle>
 
           <DialogDescription>
-            <img src={imgLink} alt="avatar" className="w-full" />
+            <img src={imgLink} alt="avatar" className="w-full aspect-[1]" />
           </DialogDescription>
 
           <DialogFooter>
@@ -103,19 +250,19 @@ export const KiotInfo = () => {
               onClick={async () => {
                 let formData = new FormData();
                 formData.append("avatar", imgFile);
-                const res = await axios
-                  .post(`uploadAvatar/user`, formData, {
+                const res: any = await axios
+                  .post(`/uploadAvatar/kiot`, formData, {
                     headers: {
                       "Content-Type": "multipart/form-data",
                     },
                   })
-                  .then((res) => res.data)
+                  .then((res) => res)
                   .catch((e) => console.log(e));
 
-                if (res.code == 200) {
+                if (res.id) {
                   toast({
-                    title: "Create success",
-                    description: `Create success at ${new Date().toLocaleString()}.`,
+                    title: "Upload avatar success",
+                    description: `Upload success at ${new Date().toLocaleString()}.`,
                   });
                   setRerender(!rerender);
                 }
@@ -133,25 +280,110 @@ export const KiotInfo = () => {
         className="hidden"
         onChange={handleFileChange}
       />
+      {/* comment */}
+      <Dialog open={open2} onOpenChange={setOpen2}>
+        <DialogContent>
+          <DialogTitle>Preview CoverImg</DialogTitle>
+
+          <DialogDescription>
+            <img
+              src={imgLink2}
+              alt="coverImage"
+              className="w-full aspect-[2.63]"
+            />
+          </DialogDescription>
+
+          <DialogFooter>
+            <Button
+              variant={"destructive"}
+              className="mr-4"
+              onClick={() => {
+                setOpen2(false);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={async () => {
+                let formData = new FormData();
+                formData.append("coverImage", imgFile2);
+                const res: any = await axios
+                  .post(`/uploadCoverImage/kiot`, formData, {
+                    headers: {
+                      "Content-Type": "multipart/form-data",
+                    },
+                  })
+                  .then((res) => res)
+                  .catch((e) => console.log(e));
+
+                if (res.id) {
+                  toast({
+                    title: "Upload cover image success",
+                    description: `Upload success at ${new Date().toLocaleString()}.`,
+                  });
+                  setRerender(!rerender);
+                }
+                setOpen2(false);
+              }}
+            >
+              Save
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <input
+        type="file"
+        ref={fileInputRef2}
+        className="hidden"
+        onChange={handleFileChange2}
+      />
       <div className="mt-12">
-        <div>User Avatar </div>
+        <div>kiot Avatar </div>
 
         {!isLoading && (
           <>
             <div className="flex flex-col items-center justify-center">
               <DropdownMenu>
-                <DropdownMenuTrigger className="flex justify-center w-1/2 mt-4">
-                  {user?.avatar?.url ? (
+                <DropdownMenuTrigger className="flex justify-center w-full mt-4">
+                  {kiotInfo?.kiot.coverImage?.url != "" ? (
                     <img
-                      src={user?.avatar?.url}
+                      src={kiotInfo?.kiot.coverImage?.url}
                       alt="avatar"
-                      className="aspect-[1] rounded-lg hover:brightness-110 transition duration-500 hover:cursor-grab"
+                      className="rounded-full aspect-[2.63] w-full rounded-lg hover:brightness-110 transition duration-500 hover:cursor-grab"
                     />
                   ) : (
                     <img
-                      src={`https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTy-6oqxazyyxQwrNeitM4NDATAlVycYmNjqc4H37cmA&s`}
+                      src={`https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQtqB4g6GQ5QPHLlf1dduVTt7xy3gEnM_fB4NA1IZ2YQ&s`}
                       alt="avatar"
-                      className="aspect-[1] rounded-lg hover:brightness-110 transition duration-500 hover:cursor-grab"
+                      className="rounded-full aspect-[2.63] w-full rounded-lg hover:brightness-110 transition duration-500 hover:cursor-grab"
+                    />
+                  )}
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem className="hover:bg-gray-100 hover:cursor-grab">
+                    View CoverImg
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="hover:bg-gray-100 hover:cursor-grab"
+                    onClick={handleUploadClick2}
+                  >
+                    Upload new CoverImg
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <DropdownMenu>
+                <DropdownMenuTrigger className="flex justify-center h-fit rounded-full aspect-[1] translate-y-[-50%]  bg-white w-1/4 mt-4">
+                  {kiotInfo?.kiot.avatar?.url ? (
+                    <img
+                      src={kiotInfo?.kiot.avatar?.url}
+                      alt="avatar"
+                      className="aspect-[1] p-2 bg-white rounded-full hover:brightness-110 transition duration-500 hover:cursor-grab"
+                    />
+                  ) : (
+                    <img
+                      src={`https://github.com/shadcn.png`}
+                      alt="avatar"
+                      className="aspect-[1] p-2 bg-white rounded-full hover:brightness-110 transition duration-500 hover:cursor-grab"
                     />
                   )}
                 </DropdownMenuTrigger>
@@ -167,188 +399,29 @@ export const KiotInfo = () => {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <div className="w-5/6 mt-6 border-2"></div>
+              <div className="w-5/6 border-2"></div>
             </div>
-            <div className="mt-4">
-              <div>User Permissions</div>
-              {(user?.permissions == "all" ||
-                user?.permissions
-                  .split("|")
-                  .includes("RequestCreateShops-Managment")) && (
-                <Accordion type="single" collapsible>
-                  <AccordionItem value="item-1">
-                    <AccordionTrigger>
-                      Quan ly yeu cau tao shop
-                    </AccordionTrigger>
-                    <AccordionContent className="ml-6">
-                      Danh sach yeu cau tao shop
-                    </AccordionContent>
-                    <AccordionContent className="ml-6">
-                      Chap nhan yeu cau tao shop
-                    </AccordionContent>
-                    <AccordionContent className="ml-6">
-                      Tu choi yeu cau tao shop
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              )}
-
-              {(user?.permissions == "all" ||
-                user?.permissions
-                  .split("|")
-                  .includes("Products-Managment")) && (
-                <div>
-                  <Accordion type="single" collapsible>
-                    <AccordionItem value="item-1">
-                      <AccordionTrigger>
-                        Quan ly yeu cau tao san pham
-                      </AccordionTrigger>
-                      <AccordionContent className="ml-6">
-                        Danh sach yeu cau tao san pham
-                      </AccordionContent>
-                      <AccordionContent className="ml-6">
-                        Chap nhan / tu choi yeu cau tao san pham
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                  <Accordion type="single" collapsible>
-                    <AccordionItem value="item-1">
-                      <AccordionTrigger>
-                        Quan ly danh muc san pham
-                      </AccordionTrigger>
-                      <AccordionContent className="ml-6">
-                        Danh sach san pham cac shop
-                      </AccordionContent>
-                      <AccordionContent className="ml-6">
-                        Ngung ban san pham
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                </div>
-              )}
-
-              {(user?.permissions == "all" ||
-                user?.permissions.split("|").includes("Kiots-Managment")) && (
-                <Accordion type="single" collapsible>
-                  <AccordionItem value="item-1">
-                    <AccordionTrigger>Quan ly Kiot</AccordionTrigger>
-                    <AccordionContent className="ml-6">
-                      Danh sach cac Kiot
-                    </AccordionContent>
-                    <AccordionContent className="ml-6">
-                      Thay doi trang thai cac kiot
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              )}
-
-              {user?.permissions == "all" && (
-                <div>
-                  <Accordion type="single" collapsible>
-                    <AccordionItem value="item-1">
-                      <AccordionTrigger>
-                        Quan ly cac khu vuc giao hoa toc
-                      </AccordionTrigger>
-                      <AccordionContent className="ml-6">
-                        Danh sach khu vuc giao hoa toc
-                      </AccordionContent>
-                      <AccordionContent className="ml-6">
-                        Tao khuc vuc giao hoa toc
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                  <Accordion type="single" collapsible>
-                    <AccordionItem value="item-1">
-                      <AccordionTrigger>
-                        Quan ly admin he thong
-                      </AccordionTrigger>
-                      <AccordionContent className="ml-6">
-                        Xem danh admin trong het thong
-                      </AccordionContent>
-                      <AccordionContent className="ml-6">
-                        Thay doi trang thai admin trong he thong
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                </div>
-              )}
-
-              {(user?.permissions == "all" ||
-                user?.permissions.split("|").includes("Users-Managment")) && (
-                <div>
-                  <Accordion type="single" collapsible>
-                    <AccordionItem value="item-1">
-                      <AccordionTrigger>Quan ly nguoi dung</AccordionTrigger>
-                      <AccordionContent className="ml-6">
-                        Xem danh sach nguoi dung
-                      </AccordionContent>
-                      <AccordionContent className="ml-6">
-                        Thay doi trang thai nguoi dung
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                </div>
-              )}
-
-              {(user?.permissions == "all" ||
-                user?.permissions.split("|").includes("Shops-Managment")) && (
-                <div>
-                  <Accordion type="single" collapsible>
-                    <AccordionItem value="item-1">
-                      <AccordionTrigger>Quan ly shop</AccordionTrigger>
-                      <AccordionContent className="ml-6">
-                        Xem danh sach shop
-                      </AccordionContent>
-                      <AccordionContent className="ml-6">
-                        Thay doi trang thai shop
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                  <Accordion type="single" collapsible>
-                    <AccordionItem value="item-1">
-                      <AccordionTrigger>
-                        Quan ly nhan vien shop
-                      </AccordionTrigger>
-                      <AccordionContent className="ml-6">
-                        Xem danh sach nhan vien shop
-                      </AccordionContent>
-                      <AccordionContent className="ml-6">
-                        Thay doi trang thai nhan vien shop
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                </div>
-              )}
-
-              {(user?.permissions == "all" ||
-                user?.permissions.split("|").includes("Orders-Managment")) && (
-                <div>
-                  <Accordion type="single" collapsible>
-                    <AccordionItem value="item-1">
-                      <AccordionTrigger>Quan ly order</AccordionTrigger>
-                      <AccordionContent className="ml-6">
-                        Xem danh sach order
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                </div>
-              )}
-
-              {(user?.permissions == "all" ||
-                user?.permissions
-                  .split("|")
-                  .includes("Transactions-Managment")) && (
-                <div>
-                  <Accordion type="single" collapsible>
-                    <AccordionItem value="item-1">
-                      <AccordionTrigger>Quan ly giao dich</AccordionTrigger>
-                      <AccordionContent className="ml-6">
-                        Xem danh sach giao dich
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                </div>
-              )}
+            <div className=" md:grid  md:grid-cols-2  flex flex-col gap-y-2 mt-4">
+              <div>
+                Danh gia trung binh:{" "}
+                {roundToTwoDecimalPlaces(+kiotInfo?.kiotInfo?.avgRating)}
+              </div>
+              <div>So danh gia: {kiotInfo?.kiotInfo?.numberOfRating}</div>
+              <div>So san pham da ban: {kiotInfo?.kiotInfo?.numberOfSold}</div>
+              <div>So san pham: {kiotInfo?.kiotInfo?.numberOfProduct}</div>
+              <div>Tong so Order: {kiotInfo?.kiotInfo?.numberOfOrder}</div>
+              <div>
+                Tong so Order thanh cong:{" "}
+                {kiotInfo?.kiotInfo?.numberOfSuccesOrder}
+              </div>
+              <div>
+                Tong so Order bi tra lai:{" "}
+                {kiotInfo?.kiotInfo?.numberOfReturnOrder}
+              </div>
+              <div>
+                Tong so Order da tu choi:{" "}
+                {kiotInfo?.kiotInfo?.numberOfRejectOrder}
+              </div>
             </div>
           </>
         )}
@@ -356,113 +429,121 @@ export const KiotInfo = () => {
 
       <div className="mt-14">
         <div className="flex flex-row justify-between items-center">
-          <div>User Profile</div>
-          <Dialog
-            open={openFormChangePass}
-            onOpenChange={setOpenFormChangePass}
-          >
-            <DialogTrigger>
-              <div className="px-4 py-2 rounded-lg bg-sky-200 hover:bg-sky-300 ">
-                Change password
-              </div>
-            </DialogTrigger>
-            <DialogContent>
-              <FormProvider {...formContext}>
-                <DialogTitle>Change password</DialogTitle>
-                <DialogDescription>
-                  <div className="mb-4">
-                    <PasswordField
-                      name="oldPassword"
-                      label="oldPassword"
-                      placeholder="oldPassword"
-                      required={true}
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <PasswordField
-                      name="newPassword"
-                      label="newPassword"
-                      placeholder="newPassword"
-                      required={true}
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <PasswordField
-                      name="reNewPassword"
-                      label="reNewPassword"
-                      placeholder="reNewPassword"
-                      required={true}
-                    />
-                  </div>
-                </DialogDescription>
-                <DialogFooter>
-                  <Button
-                    onClick={() => {
-                      setOpenFormChangePass(false);
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={handleSubmit(async (data) => {
-                      const { oldPassword, newPassword, reNewPassword } = data;
-                      if (newPassword !== reNewPassword) {
-                        toast({
-                          title: "Password not match",
-                          description: "Please check your password again",
-                        });
-                      } else {
-                        const data: any = await axios
-                          .post("/changePassword/customer", {
-                            oldPassword,
-                            newPassword,
-                          })
-                          .then((res) => res)
-                          .catch((e) => console.log(e));
-
-                        if (data.code !== 200) {
-                          toast({
-                            title: "Invalid old password",
-                            variant: "destructive",
-                          });
-                        } else {
-                          toast({
-                            title:
-                              "Change password success, Please login again",
-                          });
-                          setOpenFormChangePass(false);
-                          authProvider.logout("logout");
-                          redirect("/login");
-                        }
-                      }
-                    })}
-                  >
-                    Save
-                  </Button>
-                </DialogFooter>
-              </FormProvider>
-            </DialogContent>
-          </Dialog>
+          <div>kiot Profile</div>
         </div>
         <Form
           className="grid grid-cols-1 px-4 mt-6 gap-y-3"
-          defaultValues={{
-            id: `${user?.id}`,
-            email: `${user?.email}`,
-            role: `${user?.role}`,
-            status: `${user?.status}`,
-            createdAt: `${user?.createdAt}`,
-            updatedAt: `${user?.updatedAt}`,
+          defaultValues={kiotInfo?.kiot}
+          onSubmit={async (data: any) => {
+            const {
+              name,
+              description,
+              pickUpAddress,
+              returnAddress,
+              pickUpProvince,
+              returnProvince,
+              pickUpDistrict,
+              returnDistrict,
+              pickUpWard,
+              returnWard,
+              phoneNumber,
+              idOfArea,
+            } = data;
+
+            const dataReturn: any = await axios.patch(`kiots`, {
+              name,
+              description,
+              pickUpAddress,
+              returnAddress,
+              pickUpProvince,
+              returnProvince,
+              pickUpDistrict,
+              returnDistrict,
+              pickUpWard,
+              returnWard,
+              phoneNumber,
+              idOfArea
+            });
+
+            if (dataReturn.id) {
+              toast({
+                title: "Update kiot info success",
+                description: `Update success at ${new Date().toLocaleString()}.`,
+              });
+            } else {
+              toast({
+                title: "Update kiot info failed",
+                description: `Update failed at ${new Date().toLocaleString()}.`,
+              });
+            }
           }}
         >
           <TextInput disabled={true} source="id"></TextInput>
           <TextInput disabled={true} source="email"></TextInput>
-          <TextInput disabled={true} source="role"></TextInput>
+          <TextInput source="name"></TextInput>
+          <RichTextInput source="description"></RichTextInput>
+
+          <TextInput source="phoneNumber"></TextInput>
+          <TextInput source="pickUpAddress"></TextInput>
+          <SelectInput
+            source="pickUpProvince"
+            choices={listProvince}
+            optionText="provinceName"
+            optionValue="provinceId"
+            onChange={(e) => {
+              setSeletedProvince(e.target.value);
+            }}
+          ></SelectInput>
+          <SelectInput
+            source="pickUpDistrict"
+            choices={listDistrict}
+            optionText="districtName"
+            optionValue="districtId"
+            onChange={(e) => {
+              console.log(e.target.value);
+              setSeletedDistrict(e.target.value);
+            }}
+          ></SelectInput>
+          <SelectInput
+            source="pickUpWard"
+            choices={listWard}
+            optionText="wardName"
+            optionValue="wardCode"
+          ></SelectInput>
+          <TextInput source="returnAddress"></TextInput>
+          <SelectInput
+            source="returnProvince"
+            choices={listProvince}
+            optionText="provinceName"
+            optionValue="provinceId"
+            onChange={(e) => {
+              setSeletedProvince2(e.target.value);
+            }}
+          ></SelectInput>
+          <SelectInput
+            source="returnDistrict"
+            choices={listDistrict2}
+            optionText="districtName"
+            optionValue="districtId"
+            onChange={(e) => {
+              console.log(e.target.value);
+              setSeletedDistrict2(e.target.value);
+            }}
+          ></SelectInput>
+          <SelectInput
+            source="returnWard"
+            choices={listWard2}
+            optionText="wardName"
+            optionValue="wardCode"
+          ></SelectInput>
           <TextInput disabled={true} source="status"></TextInput>
           <DateInput disabled={true} source="createdAt"></DateInput>
           <DateInput disabled={true} source="updatedAt"></DateInput>
+          <Button>Submit</Button>
         </Form>
       </div>
     </div>
   );
 };
+
+export default KiotInfo;

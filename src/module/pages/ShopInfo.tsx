@@ -46,7 +46,7 @@ function roundToTwoDecimalPlaces(num: number) {
   return parseFloat(num.toFixed(2));
 }
 
-export const ShopInfo = () => {
+const ShopInfo = () => {
   const { data, isLoading } = useGetIdentity();
   const [shopInfo, setShopInfo] = useState<any>();
   const user = data?.user;
@@ -543,3 +543,5 @@ export const ShopInfo = () => {
     </div>
   );
 };
+
+export default ShopInfo;

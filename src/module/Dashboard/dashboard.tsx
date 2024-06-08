@@ -4,7 +4,7 @@ import ListAltIcon from "@mui/icons-material/ListAlt";
 import { useEffect, useState } from "react";
 import axios from "../AxiosCustom/custome_Axios";
 import { set } from "react-hook-form";
-import { useDataProvider, useRedirect } from "react-admin";
+import { useAuthProvider, useDataProvider, useGetIdentity, useRedirect } from "react-admin";
 import {
   Bar,
   BarChart,
@@ -38,6 +38,10 @@ export const CustomDash = () => {
   const [listProducts, setListproducts] = useState([]);
   const redirect = useRedirect();
   const dataProvider = useDataProvider();
+
+
+  const user = useGetIdentity()?.data?.user;
+  console.log(user);
 
   useEffect(() => {
     async function fetch() {

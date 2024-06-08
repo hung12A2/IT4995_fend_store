@@ -8,7 +8,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import axios from "../../module/AxiosCustom/custome_Axios";
 import { useToast } from "@/components/ui/use-toast";
 
-const EnterNewPass = () => {
+const EnterNewPassEmployee = () => {
   return (
     <Suspense>
       <EnterNewPass2 />
@@ -27,7 +27,7 @@ const EnterNewPass2 = () => {
   const onSubmit = async (data: any) => {
     const { newPassword } = data;
     const dataFetch: any = await axios
-      .post("/resetPassword/customer", { newPassword, token })
+      .post("/resetPassword/employee", { newPassword, token })
       .then((res) => res)
       .catch((e) => console.log(e));
 
@@ -51,7 +51,7 @@ const EnterNewPass2 = () => {
         <div className="container max-w-sm mx-auto flex-1 flex flex-col items-center justify-center px-2">
           <div className="bg-white px-6 py-8 rounded shadow-md text-black w-full">
             <h1 className="mb-8 text-3xl text-center font-semibold">
-              Enter New Password
+              Enter New Password Employee
             </h1>
 
             <FormProvider {...formContext}>
@@ -98,4 +98,4 @@ const EnterNewPass2 = () => {
   );
 };
 
-export default EnterNewPass;
+export default EnterNewPassEmployee;

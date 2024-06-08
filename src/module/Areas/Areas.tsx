@@ -15,6 +15,7 @@ import {
   SimpleForm,
   TextField,
   TextInput,
+  useAuthProvider,
 } from "react-admin";
 
 
@@ -41,6 +42,10 @@ const postFilters = [
 ];
 
 export const ListAreas = (props: any) => {
+
+  const {user} = useAuthProvider();
+  console.log(user);
+
   return (
     <List >
       <FilterForm filters={postFilters}></FilterForm>

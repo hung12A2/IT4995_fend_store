@@ -39,7 +39,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { authProvider } from "@/provider/authProvider";
 import { useRedirect } from "react-admin";
 
-export const Profile = () => {
+const Profile = () => {
   const formContext = useForm({});
   const { handleSubmit } = formContext;
   const [rerender, setRerender] = useState(false);
@@ -470,3 +470,5 @@ export const Profile = () => {
     </div>
   );
 };
+
+export default Profile;
