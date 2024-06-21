@@ -42,8 +42,8 @@ export const ChatContext = createContext<any>({});
 
 
 export function ChatProvider ({ children }: { children: React.ReactNode }) {
-  let user: any = localStorage.getItem("user");
-  user = JSON.parse(user).user;
+  let user: any = localStorage.getItem("user") || null;
+  user = JSON.parse(user)?.user;
 
 
   const initializer = () => {

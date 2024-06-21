@@ -344,6 +344,8 @@ export const CustomDash = () => {
             <div>
               {ListRating.map((rating: any) => (
                 <div
+                onClick={() => redirect(`/ratingsForShop/${rating.id}`)}
+
                   className="flex flex-row justify-between 	w-full border-b-2 border-gray-2 hover:bg-gray-100 px-4 rouded-lg py-2 hover:cursor-grab"
                   key={rating.id}
                 >

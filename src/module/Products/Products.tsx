@@ -2,6 +2,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { Button } from "@/components/ui/button";
 import {
+  ArrayInput,
   BooleanField,
   BooleanInput,
   Datagrid,
@@ -10,6 +11,7 @@ import {
   EditButton,
   EmailField,
   FilterForm,
+  Form,
   FunctionField,
   ImageField,
   ImageInput,
@@ -21,6 +23,7 @@ import {
   SelectInput,
   Show,
   SimpleForm,
+  SimpleFormIterator,
   TabbedShowLayout,
   TextField,
   TextInput,
@@ -46,6 +49,13 @@ import { Label } from "@mui/icons-material";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { RichTextInput } from "ra-input-rich-text";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogTitle,
+} from "@/components/ui/dialog";
 const postFilters = [
   <TextInput key={"id"} label="id" source="where.id.like" alwaysOn={true} />,
   <TextInput
@@ -79,145 +89,148 @@ export const ListProducts = (props: any) => {
   const { data } = useGetIdentity();
   const { toast } = useToast();
   const refresh = useRefresh();
+
   return (
-    <List>
-      <FilterForm filters={postFilters}></FilterForm>
-      <Datagrid bulkActionButtons={false}>
-        <TextField source="id" />
-        <TextField source="name" />
-        <TextField source="idOfCategory" />
-        <TextField source="idOfShop" />
-        <NumberField source="price" />
-        <FunctionField
-          source="status"
-          render={(record: any) => {
-            if (record.status == "active") {
-              return (
-                <div className="flex flex-row justify-center items-center">
-                  <div className="w-2 h-2 mr-2 rounded-full bg-green-400"></div>
-                  <div>active</div>
-                </div>
-              );
-            } else if (record.status == "pending") {
-              return (
-                <div className="flex flex-row justify-center items-center">
-                  <div className="w-2 h-2 mr-2 rounded-full bg-yellow-400"></div>
-                  <div>Pending</div>
-                </div>
-              );
-            } else {
-              return (
-                <div className="flex flex-row justify-center items-center">
-                  <div className="w-2 h-2 mr-2 rounded-full bg-red-400"></div>
-                  <div>banned</div>
-                </div>
-              );
-            }
-          }}
-        />
-        <EditButton label="Detail" />
+    <>
+      <List>
+        <FilterForm filters={postFilters}></FilterForm>
+        <Datagrid bulkActionButtons={false}>
+          <TextField source="id" />
+          <TextField source="name" />
+          <TextField source="idOfCategory" />
+          <TextField source="idOfShop" />
+          <NumberField source="price" />
+          <FunctionField
+            source="status"
+            render={(record: any) => {
+              if (record.status == "active") {
+                return (
+                  <div className="flex flex-row justify-center items-center">
+                    <div className="w-2 h-2 mr-2 rounded-full bg-green-400"></div>
+                    <div>active</div>
+                  </div>
+                );
+              } else if (record.status == "pending") {
+                return (
+                  <div className="flex flex-row justify-center items-center">
+                    <div className="w-2 h-2 mr-2 rounded-full bg-yellow-400"></div>
+                    <div>Pending</div>
+                  </div>
+                );
+              } else {
+                return (
+                  <div className="flex flex-row justify-center items-center">
+                    <div className="w-2 h-2 mr-2 rounded-full bg-red-400"></div>
+                    <div>banned</div>
+                  </div>
+                );
+              }
+            }}
+          />
+          <EditButton label="Detail" />
 
-        <FunctionField
-          render={(record: any) => {
-            const { id, status } = record;
-            if (status === "active") {
-              return (
-                <AlertDialog>
-                  <AlertDialogTrigger>
-                    <div className="bg-red-300 hover:bg-red-400 hover:cursor-grab px-4 py-2 rounded-md">
-                      Ban
-                    </div>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogDescription>
-                        Are you sure you want ban this user ?
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={async () => {
-                          const dataFetch = await axios
-                            .post(
-                              `${BASE_URL}products/banned/${id}`,
-                              {},
-                              {
-                                headers: {
-                                  Authorization: `Bearer ${data?.token}`,
-                                },
-                              }
-                            )
-                            .then((res) => res.data)
-                            .catch((e) => console.log(e));
+          <FunctionField
+            render={(record: any) => {
+              const { id, status } = record;
+              if (status === "active") {
+                return (
+                  <AlertDialog>
+                    <AlertDialogTrigger>
+                      <div className="bg-red-300 hover:bg-red-400 hover:cursor-grab px-4 py-2 rounded-md">
+                        Ban
+                      </div>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogDescription>
+                          Are you sure you want ban this user ?
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={async () => {
+                            const dataFetch = await axios
+                              .post(
+                                `${BASE_URL}products/banned/${id}`,
+                                {},
+                                {
+                                  headers: {
+                                    Authorization: `Bearer ${data?.token}`,
+                                  },
+                                }
+                              )
+                              .then((res) => res.data)
+                              .catch((e) => console.log(e));
 
-                          console.log(dataFetch);
-                          if (dataFetch.code == 200)
-                            toast({
-                              title: "Ban success",
-                            });
+                            console.log(dataFetch);
+                            if (dataFetch.code == 200)
+                              toast({
+                                title: "Ban success",
+                              });
 
-                          refresh();
-                        }}
-                      >
-                        YES
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              );
-            } else {
-              return (
-                <AlertDialog>
-                  <AlertDialogTrigger>
-                    <div className="bg-blue-300 hover:bg-blue-400 hover:cursor-grab px-4 py-2 rounded-md">
-                      UnBan
-                    </div>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogDescription>
-                        Are you sure you want unban this user ?
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={async () => {
-                          const dataFetch = await axios
-                            .post(
-                              `${BASE_URL}products/unbanned/${id}`,
-                              {},
-                              {
-                                headers: {
-                                  Authorization: `Bearer ${data?.token}`,
-                                },
-                              }
-                            )
-                            .then((res) => res.data)
-                            .catch((e) => console.log(e));
+                            refresh();
+                          }}
+                        >
+                          YES
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                );
+              } else {
+                return (
+                  <AlertDialog>
+                    <AlertDialogTrigger>
+                      <div className="bg-blue-300 hover:bg-blue-400 hover:cursor-grab px-4 py-2 rounded-md">
+                        UnBan
+                      </div>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogDescription>
+                          Are you sure you want unban this user ?
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={async () => {
+                            const dataFetch = await axios
+                              .post(
+                                `${BASE_URL}products/unbanned/${id}`,
+                                {},
+                                {
+                                  headers: {
+                                    Authorization: `Bearer ${data?.token}`,
+                                  },
+                                }
+                              )
+                              .then((res) => res.data)
+                              .catch((e) => console.log(e));
 
-                          console.log(dataFetch);
+                            console.log(dataFetch);
 
-                          if (dataFetch.code == 200)
-                            toast({
-                              title: "UnBun success",
-                            });
+                            if (dataFetch.code == 200)
+                              toast({
+                                title: "UnBun success",
+                              });
 
-                          refresh();
-                        }}
-                      >
-                        YES
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              );
-            }
-          }}
-        />
-      </Datagrid>
-    </List>
+                            refresh();
+                          }}
+                        >
+                          YES
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                );
+              }
+            }}
+          />
+        </Datagrid>
+      </List>
+    </>
   );
 };
 
@@ -229,7 +242,7 @@ export const ShowProducts = (props: any) => {
   const dataProvider = useDataProvider();
   const { data, isLoading } = useGetIdentity();
   const user = data?.user;
-  const {toast} = useToast();
+  const { toast } = useToast();
 
   useEffect(() => {
     async function fetchData() {
@@ -277,7 +290,7 @@ export const ShowProducts = (props: any) => {
     fetchData();
   }, [id, dataProvider]);
 
-  if (isLoading) return <div>Loading .... </div>
+  if (isLoading) return <div>Loading .... </div>;
 
   return (
     <Show>
@@ -352,9 +365,8 @@ export const ShowProducts = (props: any) => {
                 <ImageField source="src" title="title" />
               </ImageInput>
               <div className="grid grid-cols-2 gap-x-4 gap-y-4 mb-12 w-full">
-                <TextInput source="idOfShop" label="Shop Id" disabled/>
-                <TextInput source="idOfKiot" label="Kiot Id" disabled/>
-
+                <TextInput source="idOfShop" label="Shop Id" disabled />
+                <TextInput source="idOfKiot" label="Kiot Id" disabled />
 
                 <div className="flex flex-row">
                   <BooleanInput

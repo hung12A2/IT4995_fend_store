@@ -34,10 +34,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import axios from "axios";
+import axios from "../../module/AxiosCustom/custome_Axios";
 import { BASE_URL } from "@/api/constant";
 import { useToast } from "@/components/ui/use-toast";
 import { Label } from "@mui/icons-material";
+import { Form, FormProvider, useForm } from "react-hook-form";
+import { SelectField, TextField as TextField2 } from "../base/fieldBase";
 
 const postFilters = [
   <TextInput key={"id"} label="id" source="where.id.like" alwaysOn={true} />,
@@ -72,6 +74,9 @@ export const ListOrdersKiot = (props: any) => {
   const { data } = useGetIdentity();
   const { toast } = useToast();
   const refresh = useRefresh();
+  const formProvider = useForm({});
+  const { handleSubmit } = formProvider;
+
   return (
     <List>
       <FilterForm filters={postFilters}></FilterForm>
@@ -86,6 +91,262 @@ export const ListOrdersKiot = (props: any) => {
         <TextField source="paymentMethod" />
         <TextField source="requiredNote" />
         <EditButton label="Details" />
+        <FunctionField
+          render={(record: any) => {
+            const { id, status } = record;
+            if (
+              status == "received" ||
+              status == "returned" ||
+              status == "delivered" ||
+              status == "canceled" ||
+              status == "rating" ||
+              status == "rejected"
+            ) {
+              return;
+            }
+            if (status === "pending") {
+              return (
+                <div className=" flex flex-row gap-x-2">
+                  <AlertDialog>
+                    <AlertDialogTrigger>
+                      <div className="bg-blue-300 hover:bg-blue-400 hover:cursor-grab px-4 py-2 rounded-md">
+                        Accepted
+                      </div>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          Are you sure you accept this order ?
+                        </AlertDialogTitle>
+                      </AlertDialogHeader>
+                      <AlertDialogDescription>
+                        <FormProvider {...formProvider}>
+                          <div className="mb-4">
+                            <TextField2
+                              name="content"
+                              label="content"
+                              placeholder="content"
+                              required={true}
+                            />
+                          </div>
+                          <div className="mb-4">
+                            <SelectField
+                              name="requiredNote"
+                              required={true}
+                              label="requiredNote"
+                              options={[
+                                { value: "CHOTHUHANG", label: "Cho thu hang" },
+                                {
+                                  value: "KHONGCHOXEMHANG",
+                                  label: "Khong cho xem hang",
+                                },
+                                {
+                                  value: "CHOXEMHANGKHONGTHU",
+                                  label: "Cho xem hang khong thu",
+                                },
+                              ]}
+                            />
+                          </div>
+                        </FormProvider>
+                      </AlertDialogDescription>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={handleSubmit(async (data) => {
+                            data = {
+                              content: data.content,
+                              requiredNote: data.requiredNote.value,
+                            };
+                            const dataReturn: any = axios
+                              .post(`order-kiot/accepted/order/${id}`, data)
+                              .then((res) => res)
+                              .catch((e) => console.log(e));
+                            if (dataReturn) {
+                              toast({
+                                title: "Da chap nhan don hang thanh cong",
+                              });
+                            } else {
+                              toast({
+                                title: "Da co loi xay ra",
+                              });
+                            }
+                          })}
+                        >
+                          YES
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                  <AlertDialog>
+                    <AlertDialogTrigger>
+                      <div className="bg-blue-300 hover:bg-blue-400 hover:cursor-grab px-4 py-2 rounded-md">
+                        accepted
+                      </div>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogDescription>
+                          Are you sure you want ban this user ?
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={async () => {
+                            const dataFetch = await axios
+                              .post(
+                                `${BASE_URL}admins/banned/${id}`,
+                                {},
+                                {
+                                  headers: {
+                                    Authorization: `Bearer ${data?.token}`,
+                                  },
+                                }
+                              )
+                              .then((res) => res.data)
+                              .catch((e) => console.log(e));
+
+                            if (dataFetch.code == 200)
+                              toast({
+                                title: "Ban success",
+                              });
+
+                            refresh();
+                          }}
+                        >
+                          YES
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              );
+            } else if (status == "accepted") {
+              return (
+                <AlertDialog>
+                  <AlertDialogTrigger>
+                    <div className="bg-blue-300 hover:bg-blue-400 hover:cursor-grab px-4 py-2 rounded-md">
+                      Prepared
+                    </div>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogDescription>
+                        Ban da chuan bi xong don hang nay ? neu roi thi don vi
+                        van chuyen se den lay hang
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={async () => {
+                          const dataFetch = await axios
+                            .post(`order-kiot/prepared/order/${id}`)
+                            .then((res) => res)
+                            .catch((e) => console.log(e));
+                          if (dataFetch) {
+                            toast({
+                              title: "Da chuan bi xong don hang",
+                            });
+                            refresh();
+                          } else {
+                            toast({
+                              title: "Da co loi xay ra",
+                            });
+                          }
+                        }}
+                      >
+                        YES
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              );
+            } else if (status == "prepared") {
+              return (
+                <AlertDialog>
+                  <AlertDialogTrigger>
+                    <div className="bg-blue-300 hover:bg-blue-400 hover:cursor-grab px-4 py-2 rounded-md">
+                      Transisted
+                    </div>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogDescription>
+                        Don hang da duoc ban giao cho don vi van chuyen
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={async () => {
+                          const dataFetch = await axios
+                            .post(`order-kiot/inTransit/order/${id}`)
+                            .then((res) => res)
+                            .catch((e) => console.log(e));
+                          if (dataFetch) {
+                            toast({
+                              title:
+                                "Da ban giao cho don vi van chuyen thanh cong",
+                            });
+                            refresh();
+                          } else {
+                            toast({
+                              title:
+                                "Da ban giao cho don vi van chuyen thanh cong",
+                            });
+                          }
+                        }}
+                      >
+                        YES
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              );
+            }  else if (status == "inTransist") {
+              return (
+                <AlertDialog>
+                  <AlertDialogTrigger>
+                    <div className="bg-blue-300 hover:bg-blue-400 hover:cursor-grab px-4 py-2 rounded-md">
+                      Delivered
+                    </div>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogDescription>
+                        Don hang da den tay nguoi dung
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={async () => {
+                          const dataFetch = await axios
+                            .post(`order-kiot/deliverd/order/${id}`)
+                            .then((res) => res)
+                            .catch((e) => console.log(e));
+                          if (dataFetch) {
+                            toast({
+                              title: "Don hang da den tay nguoi dung",
+                            });
+                            refresh();
+                          } else {
+                            toast({
+                              title: "Cap nhap that bai",
+                            });
+                          }
+                        }}
+                      >
+                        YES
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              );
+            }
+          }}
+        />
       </Datagrid>
     </List>
   );

@@ -61,7 +61,9 @@ import { ListRating, ShowRating } from "@/module/Rating/rating";
 import Profile from "@/module/pages/Profile";
 import ShopInfo from "@/module/pages/ShopInfo";
 import KiotInfo from "@/module/pages/KiotInfo";
+import Notification from "@/module/pages/notifications";
 import { ChatProvider } from "@/provider/chatProvider";
+import { AddImportForm, ShowAddForm, listAddForm } from "@/module/AddForm/addForm";
 
 export default function Home() {
   return (
@@ -150,10 +152,14 @@ export default function Home() {
           icon={AssignmentReturnIcon}
         />
 
+        <Resource name="add-forms" list={listAddForm} create={AddImportForm} edit={ShowAddForm}/>
+
         <CustomRoutes>
           <Route path="/profile" element={<Profile />} />
           <Route path="/shopInfo" element={<ShopInfo />} />
           <Route path="/kiotInfo" element={<KiotInfo />} />
+          <Route path="/notifications" element={<Notification />} />
+
         </CustomRoutes>
 
         {/* <CustomRoutes noLayout={true}>
