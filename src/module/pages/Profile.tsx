@@ -416,27 +416,52 @@ const Profile = () => {
                           description: "Please check your password again",
                         });
                       } else {
-                        const data: any = await axios
-                          .post("/changePassword/customer", {
-                            oldPassword,
-                            newPassword,
-                          })
-                          .then((res) => res)
-                          .catch((e) => console.log(e));
+                        if (user?.role == "customer") {
+                          const data: any = await axios
+                            .post("/changePassword/customer", {
+                              oldPassword,
+                              newPassword,
+                            })
+                            .then((res) => res)
+                            .catch((e) => console.log(e));
 
-                        if (data.code !== 200) {
-                          toast({
-                            title: "Invalid old password",
-                            variant: "destructive",
-                          });
+                          if (data.code !== 200) {
+                            toast({
+                              title: "Invalid old password",
+                              variant: "destructive",
+                            });
+                          } else {
+                            toast({
+                              title:
+                                "Change password success, Please login again",
+                            });
+                            setOpenFormChangePass(false);
+                            authProvider.logout("logout");
+                            redirect("/login");
+                          }
                         } else {
-                          toast({
-                            title:
-                              "Change password success, Please login again",
-                          });
-                          setOpenFormChangePass(false);
-                          authProvider.logout("logout");
-                          redirect("/login");
+                          const data: any = await axios
+                            .post("/changePassword/employees", {
+                              oldPassword,
+                              newPassword,
+                            })
+                            .then((res) => res)
+                            .catch((e) => console.log(e));
+
+                          if (data.code !== 200) {
+                            toast({
+                              title: "Invalid old password",
+                              variant: "destructive",
+                            });
+                          } else {
+                            toast({
+                              title:
+                                "Change password success, Please login again",
+                            });
+                            setOpenFormChangePass(false);
+                            authProvider.logout("logout");
+                            redirect("/login");
+                          }
                         }
                       }
                     })}

@@ -40,6 +40,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Label } from "@mui/icons-material";
 import { Form, FormProvider, useForm } from "react-hook-form";
 import { SelectField, TextField as TextField2 } from "../base/fieldBase";
+import { checkPermission } from "@/lib/helper";
 
 const postFilters = [
   <TextInput key={"id"} label="id" source="where.id.like" alwaysOn={true} />,
@@ -71,11 +72,23 @@ const postFilters = [
 ];
 
 export const ListOrdersKiot = (props: any) => {
-  const { data } = useGetIdentity();
   const { toast } = useToast();
   const refresh = useRefresh();
   const formProvider = useForm({});
   const { handleSubmit } = formProvider;
+  
+  const { data } = useGetIdentity();
+
+  const user = data?.user;
+
+
+  if (checkPermission("OrdersKiot-Managment", user?.permissions) == false) {
+    return (
+      <div className="w-full h-[50vh] flex flex-col items-center justify-center text-xl font-medium">
+        Ban khong co quyen truy cap
+      </div>
+    );
+  }
 
   return (
     <List>
@@ -353,6 +366,20 @@ export const ListOrdersKiot = (props: any) => {
 };
 
 export const ShowOrdersKiot = (props: any) => {
+
+  const { data } = useGetIdentity();
+
+  const user = data?.user;
+
+
+  if (checkPermission("OrdersKiot-Managment", user?.permissions) == false) {
+    return (
+      <div className="w-full h-[50vh] flex flex-col items-center justify-center text-xl font-medium">
+        Ban khong co quyen truy cap
+      </div>
+    );
+  }
+
   return (
     <Show>
       <TabbedShowLayout>

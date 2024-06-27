@@ -4,7 +4,9 @@ import {
   DateField,
   DateInput,
   Form,
+  RichTextField,
   SelectInput,
+  TextField,
   TextInput,
   useGetIdentity,
   useRefresh,
@@ -225,6 +227,234 @@ const ShopInfo = () => {
   }, [seletedDistrict2]);
 
   if (isLoading) return <div>Loading...</div>;
+
+  if (user?.role != "customer") {
+    return (
+      <div className="grid md:grid-cols-2 w-full h-full px-4 border-l-2 mb-12">
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogContent>
+            <DialogTitle>Preview Avatar</DialogTitle>
+
+            <DialogDescription>
+              <img src={imgLink} alt="avatar" className="w-full" />
+            </DialogDescription>
+
+            <DialogFooter>
+              <Button
+                variant={"destructive"}
+                className="mr-4"
+                onClick={() => {
+                  setOpen(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={async () => {
+                  let formData = new FormData();
+                  formData.append("avatar", imgFile);
+                  const res: any = await axios
+                    .post(`/uploadAvatar/shop`, formData, {
+                      headers: {
+                        "Content-Type": "multipart/form-data",
+                      },
+                    })
+                    .then((res) => res)
+                    .catch((e) => console.log(e));
+
+                  if (res.id) {
+                    toast({
+                      title: "Upload avatar success",
+                      description: `Upload success at ${new Date().toLocaleString()}.`,
+                    });
+                    setRerender(!rerender);
+                  }
+                  setOpen(false);
+                }}
+              >
+                Save
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+        <input
+          type="file"
+          ref={fileInputRef}
+          className="hidden"
+          onChange={handleFileChange}
+        />
+        {/* comment */}
+        <Dialog open={open2} onOpenChange={setOpen2}>
+          <DialogContent>
+            <DialogTitle>Preview CoverImg</DialogTitle>
+
+            <DialogDescription>
+              <img
+                src={imgLink2}
+                alt="coverImage"
+                className="w-full aspect-[2.63]"
+              />
+            </DialogDescription>
+
+            <DialogFooter>
+              <Button
+                variant={"destructive"}
+                className="mr-4"
+                onClick={() => {
+                  setOpen2(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={async () => {
+                  let formData = new FormData();
+                  formData.append("coverImage", imgFile2);
+                  const res: any = await axios
+                    .post(`/uploadCoverImage/shop`, formData, {
+                      headers: {
+                        "Content-Type": "multipart/form-data",
+                      },
+                    })
+                    .then((res) => res)
+                    .catch((e) => console.log(e));
+
+                  if (res.id) {
+                    toast({
+                      title: "Upload cover image success",
+                      description: `Upload success at ${new Date().toLocaleString()}.`,
+                    });
+                    setRerender(!rerender);
+                  }
+                  setOpen2(false);
+                }}
+              >
+                Save
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+        <input
+          type="file"
+          ref={fileInputRef2}
+          className="hidden"
+          onChange={handleFileChange2}
+        />
+        <div className="mt-12">
+          <div>Shop Avatar </div>
+
+          {!isLoading && (
+            <>
+              <div className="flex flex-col items-center justify-center">
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="flex justify-center w-full mt-4">
+                    {shopInfo?.shop.coverImage?.url != "" ? (
+                      <img
+                        src={shopInfo?.shop.coverImage?.url}
+                        alt="avatar"
+                        className="rounded-full aspect-[2.63] w-full rounded-lg hover:brightness-110 transition duration-500 hover:cursor-grab"
+                      />
+                    ) : (
+                      <img
+                        src={`https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQtqB4g6GQ5QPHLlf1dduVTt7xy3gEnM_fB4NA1IZ2YQ&s`}
+                        alt="avatar"
+                        className="rounded-full aspect-[2.63] w-full rounded-lg hover:brightness-110 transition duration-500 hover:cursor-grab"
+                      />
+                    )}
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem className="hover:bg-gray-100 hover:cursor-grab">
+                      View CoverImg
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="flex justify-center h-fit rounded-full aspect-[1] translate-y-[-50%]  bg-white w-1/4 mt-4">
+                    {shopInfo?.shop.avatar?.url ? (
+                      <img
+                        src={shopInfo?.shop.avatar?.url}
+                        alt="avatar"
+                        className="aspect-[1] p-2 bg-white rounded-full hover:brightness-110 transition duration-500 hover:cursor-grab"
+                      />
+                    ) : (
+                      <img
+                        src={`https://github.com/shadcn.png`}
+                        alt="avatar"
+                        className="aspect-[1] p-2 bg-white rounded-full hover:brightness-110 transition duration-500 hover:cursor-grab"
+                      />
+                    )}
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem className="hover:bg-gray-100 hover:cursor-grab">
+                      View Avatar
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="hover:bg-gray-100 hover:cursor-grab"
+                      onClick={handleUploadClick}
+                    >
+                      Upload new avatar
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <div className="w-5/6 border-2"></div>
+              </div>
+              <div className=" md:grid  md:grid-cols-2  flex flex-col gap-y-2 mt-4">
+                <div>
+                  Danh gia trung binh:{" "}
+                  {roundToTwoDecimalPlaces(+shopInfo?.shopInfo?.avgRating)}
+                </div>
+                <div>So danh gia: {shopInfo?.shopInfo?.numberOfRating}</div>
+                <div>
+                  So san pham da ban: {shopInfo?.shopInfo?.numberOfSold}
+                </div>
+                <div>So san pham: {shopInfo?.shopInfo?.numberOfProduct}</div>
+                <div>Tong so Order: {shopInfo?.shopInfo?.numberOfOrder}</div>
+                <div>
+                  Tong so Order thanh cong:{" "}
+                  {shopInfo?.shopInfo?.numberOfSuccesOrder}
+                </div>
+                <div>
+                  Tong so Order bi tra lai:{" "}
+                  {shopInfo?.shopInfo?.numberOfReturnOrder}
+                </div>
+                <div>
+                  Tong so Order da tu choi:{" "}
+                  {shopInfo?.shopInfo?.numberOfRejectOrder}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+
+        <div className="mt-14">
+          <div className="flex flex-row justify-between items-center">
+            <div>Shop Profile</div>
+          </div>
+          <Form
+            className="grid grid-cols-1 px-4 mt-6 gap-y-3"
+            defaultValues={shopInfo?.shop}
+          >
+            <TextInput disabled={true} source="id"></TextInput>
+            <TextInput disabled={true} source="email"></TextInput>
+            <TextInput disabled={true} source="name"></TextInput>
+            <TextInput disabled={true} source="description"></TextInput>
+            <TextInput disabled={true} source="pickUpAddress"></TextInput>
+            <TextInput disabled={true} source="phoneNumber"></TextInput>
+            <TextInput disabled={true} source="pickUpProvince"></TextInput>
+            <TextInput disabled={true} source="pickUpDistrict"></TextInput>
+            <TextInput disabled={true} source="pickUpWard"></TextInput>
+            <TextInput disabled={true} source="returnAddress"></TextInput>
+            <TextInput disabled={true} source="returnProvince"></TextInput>
+            <TextInput disabled={true} source="returnDistrict"></TextInput>
+            <TextInput disabled={true} source="returnWard"></TextInput>
+            <TextInput disabled={true} source="status"></TextInput>
+            <DateField disabled={true} source="createdAt"></DateField>
+            <DateField disabled={true} source="updatedAt"></DateField>
+          </Form>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="grid md:grid-cols-2 w-full h-full px-4 border-l-2 mb-12">

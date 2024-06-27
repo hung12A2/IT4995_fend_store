@@ -1,3 +1,5 @@
+'use client'
+
 import { BASE_URL } from "./constant";
 
 export const signIn = async (
@@ -17,7 +19,7 @@ export const signIn = async (
     const json = await result.json();
     const token = json.token;
     if (typeof window !== "undefined") {
-      localStorage.setItem("token", JSON.stringify({ token }));
+      window?.localStorage?.setItem("token", JSON.stringify({ token }));
     }
 
     const user = await (
@@ -29,7 +31,7 @@ export const signIn = async (
       })
     ).json();
     if (typeof window !== "undefined") {
-      localStorage.setItem("user", JSON.stringify({ user }));
+      window?.localStorage?.setItem("user", JSON.stringify({ user }));
     }
     return json;
   } else  {
@@ -44,7 +46,7 @@ export const signIn = async (
     const json = await result.json();
     const token = json.token;
     if (typeof window !== "undefined") {
-      localStorage.setItem("token", JSON.stringify({ token }));
+      window?.localStorage?.setItem("token", JSON.stringify({ token }));
     }
 
     const user = await (
@@ -56,7 +58,7 @@ export const signIn = async (
       })
     ).json();
     if (typeof window !== "undefined") {
-      localStorage.setItem("user", JSON.stringify({ user }));
+      window?.localStorage?.setItem("user", JSON.stringify({ user }));
     }
     return json;
   }

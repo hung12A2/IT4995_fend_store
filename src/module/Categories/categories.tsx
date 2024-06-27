@@ -98,51 +98,12 @@ export const ListCategories = (props: any) => {
               );
           }}
         />
-        <EditButton />
+        <EditButton label="Detail" />
       </Datagrid>
     </List>
   );
 };
 
-export const CreateCategories = (props: any) => {
-  const dataProvider = useDataProvider();
-  return (
-    <Create>
-      <SimpleForm
-        onSubmit={async (data: any) => {
-          console.log(data);
-          let formData = new FormData();
-          formData.append("cateName", data.cateName);
-          formData.append("description", data.description);
-          data.image.forEach((file: any) => {
-            formData.append("image", file.rawFile);
-          });
-          const res = await axios
-            .post(`${BASE_URL}categories`, formData, {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-            })
-            .then((res) => res.data)
-            .catch((e) => console.log(e));
-
-          console.log(res);
-        }}
-      >
-        <TextInput source="cateName" />
-        <TextInput source="description" />
-        <ImageInput
-          source="image"
-          label="Image"
-          accept="image/*"
-          multiple={true}
-        >
-          <ImageField source="src" title="title" />
-        </ImageInput>
-      </SimpleForm>
-    </Create>
-  );
-};
 
 export const EditCategories = (props: any) => {
   const dataProvider = useDataProvider();

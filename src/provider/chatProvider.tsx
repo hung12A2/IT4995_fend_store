@@ -33,18 +33,20 @@ const reducer = (state: any, action: any) => {
   }
 };
 
-
 export const useChatContext = () => {
   return useContext<any>(ChatContext);
 };
 
 export const ChatContext = createContext<any>({});
 
+export function ChatProvider({ children }: { children: React.ReactNode }) {
+  let user: any = "";
 
-export function ChatProvider ({ children }: { children: React.ReactNode }) {
-  let user: any = localStorage.getItem("user") || null;
-  user = JSON.parse(user)?.user;
+  if (typeof window !== "undefined") {
+    user = window?.localStorage?.getItem("user") || null;
+    user = JSON.parse(user)?.user;
 
+  }
 
   const initializer = () => {
     return {};
@@ -159,5 +161,4 @@ export function ChatProvider ({ children }: { children: React.ReactNode }) {
   };
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
-
 }

@@ -56,6 +56,7 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { checkPermission } from "@/lib/helper";
 const postFilters = [
   <TextInput key={"id"} label="id" source="where.id.like" alwaysOn={true} />,
   <TextInput
@@ -292,6 +293,14 @@ export const ShowProducts = (props: any) => {
 
   if (isLoading) return <div>Loading .... </div>;
 
+  if (checkPermission("Products-Managment", user?.permissions) == false) {
+    return (
+      <div className="w-full h-[50vh] flex flex-col items-center justify-center text-xl font-medium">
+        Ban khong co quyen truy cap
+      </div>
+    );
+  }
+
   return (
     <Show>
       <TabbedShowLayout>
@@ -386,7 +395,7 @@ export const ShowProducts = (props: any) => {
 
                 <NumberInput source="price" label="price" />
 
-                <NumberInput source="countInStock" label="countInStock" />
+                <NumberInput source="countInStock" label="countInStock" disabled/>
 
                 <TextInput source="status" label="Status" disabled={true} />
 

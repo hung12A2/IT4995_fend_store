@@ -8,10 +8,13 @@ const getOptions = () => {
   if (!options.headers) {
     options.headers = new Headers({ Accept: "multipart/form-data" });
   }
-  const data: any = localStorage.getItem("token");
-  const { token } = JSON.parse(data);
-  options.headers.set("Authorization", `Bearer ${token}`);
-  return options;
+  let data: any = "";
+  if (typeof window !== "undefined") {
+    data = window?.localStorage?.getItem("token");
+    const { token } = JSON.parse(data);
+    options.headers.set("Authorization", `Bearer ${token}`);
+    return options;
+  }
 };
 
 export const dataProvider = {
@@ -82,7 +85,7 @@ export const dataProvider = {
     console.log("getList");
     const { filter, pagination, sort } = params;
 
-    if (pagination ) {
+    if (pagination) {
       const { page, perPage } = pagination;
       const limit = perPage;
       const skip = (page - 1) * perPage;
@@ -171,14 +174,14 @@ export const dataProvider = {
 
   getManyReference: async (resource: string, params: any) => {
     console.log("getManyReference");
-    console.log(`resource`,resource);
+    console.log(`resource`, resource);
     console.log(`params`, params);
 
     const filterReturn = {
       where: {
         [params.target]: params.id,
-      }
-    }
+      },
+    };
 
     const apiUrl = `${BASE_URL}`;
 

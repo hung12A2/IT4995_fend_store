@@ -35,6 +35,7 @@ import axios from "axios";
 import { BASE_URL } from "@/api/constant";
 import { useToast } from "@/components/ui/use-toast";
 import { Label } from "@mui/icons-material";
+import { checkPermission } from "@/lib/helper";
 
 const postFilters = [
   <TextInput key={"id"} label="id" source="where.id.like" alwaysOn={true} />,
@@ -62,6 +63,25 @@ export const ListShopTrangsaction = (props: any) => {
   const { data } = useGetIdentity();
   const { toast } = useToast();
   const refresh = useRefresh();
+
+  const user = data?.user;
+
+  if (checkPermission("Orders-Managment", user?.permissions) == false) {
+    return (
+      <div className="w-full h-[50vh] flex flex-col items-center justify-center text-xl font-medium">
+        Ban khong co quyen truy cap
+      </div>
+    );
+  }
+
+  if (checkPermission("OrdersKiot-Managment", user?.permissions) == false) {
+    return (
+      <div className="w-full h-[50vh] flex flex-col items-center justify-center text-xl font-medium">
+        Ban khong co quyen truy cap
+      </div>
+    );
+  }
+
   return (
     <List>
       <FilterForm filters={postFilters}></FilterForm>
@@ -79,6 +99,27 @@ export const ListShopTrangsaction = (props: any) => {
 };
 
 export const ShowShopTransaction = (props: any) => {
+
+  const { data } = useGetIdentity();
+
+  const user = data?.user;
+
+  if (checkPermission("Orders-Managment", user?.permissions) == false) {
+    return (
+      <div className="w-full h-[50vh] flex flex-col items-center justify-center text-xl font-medium">
+        Ban khong co quyen truy cap
+      </div>
+    );
+  }
+
+  if (checkPermission("OrdersKiot-Managment", user?.permissions) == false) {
+    return (
+      <div className="w-full h-[50vh] flex flex-col items-center justify-center text-xl font-medium">
+        Ban khong co quyen truy cap
+      </div>
+    );
+  }
+
   return (
     <Show>
       <TabbedShowLayout>

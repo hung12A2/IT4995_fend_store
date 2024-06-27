@@ -43,6 +43,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import Chat from "../chat/chat";
+import { checkPermission } from "@/lib/helper";
 
 const postFilters = [
   <TextInput key={"id"} label="id" source="where.id.like" alwaysOn={true} />,
@@ -71,6 +72,16 @@ export const ListEmployee = (props: any) => {
   const { data } = useGetIdentity();
   const { toast } = useToast();
   const refresh = useRefresh();
+  const user = data?.user;
+
+  if (checkPermission("all", user?.permissions) == false) {
+    return (
+      <div className="w-full h-[50vh] flex flex-col items-center justify-center text-xl font-medium">
+        Ban khong co quyen truy cap
+      </div>
+    );
+  }
+  
   return (
     <>
       <Chat />

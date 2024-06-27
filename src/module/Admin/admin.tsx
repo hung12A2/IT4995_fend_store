@@ -254,10 +254,6 @@ export const CreateAdmin = (props: any) => {
           source="permissions"
           choices={[
             { id: "Products-Managment", name: "Products-Managment" },
-            {
-              id: "RequestCreateShops-Managment",
-              name: "RequestCreateShops-Managment",
-            },
             { id: "Users-Managment", name: "Users-Managment" },
             { id: "Kiots-Managment", name: "Kiots-Managment" },
             { id: "Shops-Managment", name: "Shops-Managment" },

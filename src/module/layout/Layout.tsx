@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import {
   AppBar,
   Layout,
@@ -77,6 +78,7 @@ const MenuItems = () => {
 };
 
 const MyAvatar = ({ avatar }: { avatar: string }) => {
+  console.log(avatar);
   return (
     <Avatar>
       <AvatarImage src={avatar}></AvatarImage>

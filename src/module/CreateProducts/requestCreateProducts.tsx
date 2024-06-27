@@ -49,6 +49,7 @@ import { RichTextInput } from "ra-input-rich-text";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Form } from "react-hook-form";
+import { checkPermission } from "@/lib/helper";
 
 const postFilters = [
   <TextInput key={"id"} label="id" source="where.id.like" alwaysOn={true} />,
@@ -80,9 +81,20 @@ const postFilters = [
 ];
 
 export const ListRequestProducts = (props: any) => {
-  const { data } = useGetIdentity();
   const { toast } = useToast();
   const refresh = useRefresh();
+  const { data } = useGetIdentity();
+  const user = data?.user;
+
+  if (checkPermission("Products-Managment", user?.permissions) == false) {
+    return (
+      <div className="w-full h-[50vh] flex flex-col items-center justify-center text-xl font-medium">
+        Ban khong co quyen truy cap
+      </div>
+    );
+  }
+  
+
   return (
     <List>
       <FilterForm filters={postFilters}></FilterForm>
@@ -129,6 +141,9 @@ export const CreateRequestProducts = (props: any) => {
   const [listCate, setListCate] = useState<any>([]);
   const dataProvider = useDataProvider();
 
+  const { data } = useGetIdentity();
+  const user = data?.user;
+
   useEffect(() => {
     async function fetchData() {
       let dataReturnCate: any = await axios
@@ -148,6 +163,15 @@ export const CreateRequestProducts = (props: any) => {
 
     fetchData();
   }, [dataProvider]);
+
+  if (checkPermission("Products-Managment", user?.permissions) == false) {
+    return (
+      <div className="w-full h-[50vh] flex flex-col items-center justify-center text-xl font-medium">
+        Ban khong co quyen truy cap
+      </div>
+    );
+  }
+  
 
   return (
     <Create>
@@ -271,6 +295,9 @@ export const ShowRequest = (props: any) => {
   const [listCate, setListCate] = useState<any>([]);
   const dataProvider = useDataProvider();
 
+  const { data } = useGetIdentity();
+  const user = data?.user;
+
   useEffect(() => {
     async function fetchData() {
       let dataReturn = await dataProvider
@@ -316,6 +343,15 @@ export const ShowRequest = (props: any) => {
 
     fetchData();
   }, [id, dataProvider]);
+
+  if (checkPermission("Products-Managment", user?.permissions) == false) {
+    return (
+      <div className="w-full h-[50vh] flex flex-col items-center justify-center text-xl font-medium">
+        Ban khong co quyen truy cap
+      </div>
+    );
+  }
+  
 
   return (
     <Show>

@@ -21,7 +21,6 @@ import {
 } from "@/module/Employees/Employees";
 import { ListAdmin, CreateAdmin, EditAdmin } from "@/module/Admin/admin";
 import {
-  CreateCategories,
   EditCategories,
   ListCategories,
 } from "@/module/Categories/categories";
@@ -63,108 +62,119 @@ import ShopInfo from "@/module/pages/ShopInfo";
 import KiotInfo from "@/module/pages/KiotInfo";
 import Notification from "@/module/pages/notifications";
 import { ChatProvider } from "@/provider/chatProvider";
-import { AddImportForm, ShowAddForm, listAddForm } from "@/module/AddForm/addForm";
+import {
+  AddImportForm,
+  ShowAddForm,
+  ListAddForm,
+} from "@/module/AddForm/addForm";
+import { useEffect } from "react";
 
 export default function Home() {
-  return (
-    <ChatProvider>
-      <Admin
-        loginPage={Login}
-        authProvider={authProvider}
-        dataProvider={dataProvider}
-        layout={MainLayout}
-        dashboard={CustomDash}
-      >
-        <Resource
-          name="categories"
-          list={ListCategories}
-          edit={EditCategories}
-          icon={CategoryOutlinedIcon}
-          options={{
-            label: "Categories",
-          }}
-        />
+  if (typeof document !== "undefined") {
+    return (
+      <ChatProvider>
+        <Admin
+          loginPage={Login}
+          authProvider={authProvider}
+          dataProvider={dataProvider}
+          layout={MainLayout}
+          dashboard={CustomDash}
+        >
+          <Resource
+            name="categories"
+            list={ListCategories}
+            edit={EditCategories}
+            icon={CategoryOutlinedIcon}
+            options={{
+              label: "Categories",
+            }}
+          />
 
-        <Resource
-          name="employeesForShop"
-          list={ListEmployee}
-          create={createEmployee}
-          edit={ShowEmployee}
-          icon={BadgeSharpIcon}
-          options={{
-            label: "Employees",
-          }}
-        />
+          <Resource
+            name="employeesForShop"
+            list={ListEmployee}
+            create={createEmployee}
+            edit={ShowEmployee}
+            icon={BadgeSharpIcon}
+            options={{
+              label: "Employees",
+            }}
+          />
 
-        <Resource
-          name="productsForShop"
-          list={ListProducts}
-          edit={ShowProducts}
-          icon={ProductionQuantityLimitsOutlinedIcon}
-          options={{ label: "Products" }}
-        />
+          <Resource
+            name="productsForShop"
+            list={ListProducts}
+            edit={ShowProducts}
+            icon={ProductionQuantityLimitsOutlinedIcon}
+            options={{ label: "Products" }}
+          />
 
-        <Resource
-          name="request-create-products-for-shop"
-          list={ListRequestProducts}
-          create={CreateRequestProducts}
-          edit={ShowRequest}
-          icon={ProductionQuantityLimitsOutlinedIcon}
-          options={{ label: "Request Products" }}
-        />
+          <Resource
+            name="request-create-products-for-shop"
+            list={ListRequestProducts}
+            create={CreateRequestProducts}
+            edit={ShowRequest}
+            icon={ProductionQuantityLimitsOutlinedIcon}
+            options={{ label: "Request Products" }}
+          />
 
-        <Resource
-          name="ordersShop"
-          list={ListOrder}
-          edit={ShowOrder}
-          options={{ label: "Orders" }}
-          icon={ListAltIcon}
-        />
+          <Resource
+            name="ordersShop"
+            list={ListOrder}
+            edit={ShowOrder}
+            options={{ label: "Orders" }}
+            icon={ListAltIcon}
+          />
 
-        <Resource
-          name="ordersKiotShop"
-          list={ListOrdersKiot}
-          edit={ShowOrdersKiot}
-          options={{ label: "OrdersKiot" }}
-          icon={ListAltIcon}
-        />
+          <Resource
+            name="ordersKiotShop"
+            list={ListOrdersKiot}
+            edit={ShowOrdersKiot}
+            options={{ label: "OrdersKiot" }}
+            icon={ListAltIcon}
+          />
 
-        <Resource
-          name="transaction-shopsForShop"
-          list={ListShopTrangsaction}
-          edit={ShowShopTransaction}
-          options={{ label: "Transaction" }}
-          icon={AddBusinessIcon}
-        />
+          <Resource
+            name="transaction-shopsForShop"
+            list={ListShopTrangsaction}
+            edit={ShowShopTransaction}
+            options={{ label: "Transaction" }}
+            icon={AddBusinessIcon}
+          />
 
-        <Resource
-          name="return-ordersForShop"
-          list={ListReturnOrder}
-          edit={ShowReturnOrder}
-          icon={AssignmentReturnIcon}
-        />
-        {/* ratingsForShop */}
+          <Resource
+            name="return-ordersForShop"
+            list={ListReturnOrder}
+            edit={ShowReturnOrder}
+            icon={AssignmentReturnIcon}
+          />
+          {/* ratingsForShop */}
 
-        <Resource
-          name="ratingsForShop"
-          list={ListRating}
-          edit={ShowRating}
-          icon={AssignmentReturnIcon}
-        />
+          <Resource
+            name="ratingsForShop"
+            list={ListRating}
+            edit={ShowRating}
+            icon={AssignmentReturnIcon}
+          />
 
-        <Resource name="add-forms" list={listAddForm} create={AddImportForm} edit={ShowAddForm}/>
+          <Resource
+            name="add-forms"
+            list={ListAddForm}
+            create={AddImportForm}
+            edit={ShowAddForm}
+          />
 
-        <CustomRoutes>
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/shopInfo" element={<ShopInfo />} />
-          <Route path="/kiotInfo" element={<KiotInfo />} />
-          <Route path="/notifications" element={<Notification />} />
+          <CustomRoutes>
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/shopInfo" element={<ShopInfo />} />
+            <Route path="/kiotInfo" element={<KiotInfo />} />
+            <Route path="/notifications" element={<Notification />} />
+          </CustomRoutes>
 
-        </CustomRoutes>
-
-        {/* <CustomRoutes noLayout={true}>
+          {/* <CustomRoutes noLayout={true}>
       </CustomRoutes> */}
-      </Admin>
-    </ChatProvider>
-  );
+        </Admin>
+      </ChatProvider>
+    );
+  }
 }

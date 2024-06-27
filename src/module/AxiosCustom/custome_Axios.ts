@@ -1,5 +1,8 @@
+'use client'
+
 import { BASE_URL } from "@/api/constant";
 import axios from "axios";
+
 
 const instance = axios.create({
   baseURL: `${BASE_URL}`,
@@ -11,8 +14,13 @@ const instance = axios.create({
 instance.interceptors.request.use(
   function (config) {
     // Do something before request is sent
-    let token: any = localStorage.getItem("token");
-    token = JSON.parse(token);
+    let token: any = ''
+    if (typeof window !== "undefined") {
+      token = window?.localStorage?.getItem("token");
+      token = JSON.parse(token);
+
+    }
+
     token = token.token;
     config.headers.Authorization = token ? `Bearer ${token}` : "";
     return config;

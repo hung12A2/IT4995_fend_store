@@ -7,7 +7,11 @@ export type Credentials = {
   role: string;
 };
 
-const login = async ({ email, password, role ='customer' }: Credentials): Promise<boolean> => {
+const login = async ({
+  email,
+  password,
+  role = "customer",
+}: Credentials): Promise<boolean> => {
   try {
     await signIn(email, password, role);
     return true;
@@ -18,14 +22,18 @@ const login = async ({ email, password, role ='customer' }: Credentials): Promis
 };
 
 const logout = async () => {
-  localStorage.removeItem("user");
+  if (typeof window !== "undefined") {
+    window?.localStorage?.removeItem("user");
+  }
   return Promise.resolve();
 };
 
 const checkError = (error: any) => {
   const status = error.status;
   if (status === 401 || status === 403) {
-    localStorage.removeItem("user");
+    if (typeof window !== "undefined") {
+      window?.localStorage?.removeItem("user");
+    }
     return Promise.reject();
   }
 
@@ -33,37 +41,50 @@ const checkError = (error: any) => {
 };
 
 const checkAuth = (params: any) => {
-  let user: any = localStorage.getItem("user");
-  user = JSON.parse(user).user;
-  const { status } = user;
-  console.log (status)
+  let user: any = "";
+  if (typeof window !== "undefined") {
+    user = window?.localStorage?.getItem("user");
+    user = JSON.parse(user).user;
 
-  if (status !== "active") { 
+  }
+  const { status } = user;
+  console.log(status);
+
+  if (status !== "active") {
     return Promise.reject({
-      message: 'User not active'
-    })
+      message: "User not active",
+    });
   }
 
-  return localStorage.getItem("user") 
+  return window?.localStorage?.getItem("user")
     ? Promise.resolve()
     : Promise.reject({
-      message: 'User not authenticated'
-    });
+        message: "User not authenticated",
+      });
 };
 
 const getPermissions = (params: any) => {
-  let user: any = localStorage.getItem("user");
-  user = JSON.parse(user);
+  let user: any = "";
+  if (typeof window !== "undefined") {
+    user = window?.localStorage?.getItem("user");
+    user = JSON.parse(user);
+
+  }
 
   const { permissions } = user;
   return Promise.resolve({ permissions });
 };
 
 const getIdentity = () => {
-  let user: any = localStorage.getItem("user");
-  let token: any = localStorage.getItem("token");
-  user = JSON.parse(user);
-  token = JSON.parse(token);
+  let user: any = "";
+  let token: any = "";
+  if (typeof window !== "undefined") {
+    user = window?.localStorage?.getItem("user");
+    token = window?.localStorage?.getItem("token");
+    user = JSON.parse(user);
+    token = JSON.parse(token);
+  }
+
   user.token = token.token;
   const identity = user;
   return Promise.resolve(identity);

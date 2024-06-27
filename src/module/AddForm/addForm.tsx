@@ -28,8 +28,10 @@ import {
   TextField,
   TextInput,
   useAuthProvider,
+  useGetIdentity,
 } from "react-admin";
 import axios from "../../module/AxiosCustom/custome_Axios";
+import { checkPermission } from "@/lib/helper";
 
 const postFilters = [
   <TextInput key={"id"} label="id" source="where.id.like" alwaysOn={true} />,
@@ -53,7 +55,20 @@ const postFilters = [
   />,
 ];
 
-export const listAddForm = (props: any) => {
+export const ListAddForm = (props: any) => {
+
+  const { data } = useGetIdentity();
+
+  const user = data?.user;
+
+  if (checkPermission("Products-Managment", user?.permissions) == false) {
+    return (
+      <div className="w-full h-[50vh] flex flex-col items-center justify-center text-xl font-medium">
+        Ban khong co quyen truy cap
+      </div>
+    );
+  }
+
   return (
     <List>
       <FilterForm filters={postFilters}></FilterForm>
@@ -87,6 +102,18 @@ export const AddImportForm = (props: any) => {
 
     fetchData();
   }, []);
+
+  const { data } = useGetIdentity();
+
+  const user = data?.user;
+
+  if (checkPermission("Products-Managment", user?.permissions) == false) {
+    return (
+      <div className="w-full h-[50vh] flex flex-col items-center justify-center text-xl font-medium">
+        Ban khong co quyen truy cap
+      </div>
+    );
+  }
 
   return (
     <Create>
@@ -133,6 +160,18 @@ export const AddImportForm = (props: any) => {
 };
 
 export const ShowAddForm = (props: any) => {
+
+  const { data } = useGetIdentity();
+
+  const user = data?.user;
+
+  if (checkPermission("Products-Managment", user?.permissions) == false) {
+    return (
+      <div className="w-full h-[50vh] flex flex-col items-center justify-center text-xl font-medium">
+        Ban khong co quyen truy cap
+      </div>
+    );
+  }
   return (
     <Show>
       <TabbedShowLayout>
