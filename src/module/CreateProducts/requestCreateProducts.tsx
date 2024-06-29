@@ -93,7 +93,6 @@ export const ListRequestProducts = (props: any) => {
       </div>
     );
   }
-  
 
   return (
     <List>
@@ -171,12 +170,12 @@ export const CreateRequestProducts = (props: any) => {
       </div>
     );
   }
-  
 
   return (
     <Create>
       <SimpleForm
         onSubmit={(data: any) => {
+          console.log(data);
           let formData = new FormData();
           if (!data.image) {
             toast({
@@ -230,7 +229,7 @@ export const CreateRequestProducts = (props: any) => {
               }
             )
             .then((res: any) => {
-              if (res.code == 200) {
+              if (res?.id) {
                 toast({
                   title: "Create Success",
                 });
@@ -351,7 +350,6 @@ export const ShowRequest = (props: any) => {
       </div>
     );
   }
-  
 
   return (
     <Show>
@@ -361,64 +359,75 @@ export const ShowRequest = (props: any) => {
             <SimpleForm
               defaultValues={requesData}
               onSubmit={(data: any) => {
-                let formData = new FormData();
-                console.log(data.image);
-                data.image.forEach((item: any) => {
-                  if (item.rawFile) {
-                    formData.append("images", item.rawFile);
-                  } else {
-                    item = {
-                      url: item.src,
-                      filename: item.filename,
-                    };
-                    formData.append("oldImages[]", JSON.stringify(item));
-                  }
-                });
-
-                if (data.isKiotProduct == true && !data.idOfKiot) {
-                  toast({
-                    title: "you dont have Kiot",
+                if (requesData.status == "pending") {
+                  let formData = new FormData();
+                  console.log(data.image);
+                  data.image.forEach((item: any) => {
+                    if (item.rawFile) {
+                      formData.append("images", item.rawFile);
+                    } else {
+                      item = {
+                        url: item.src,
+                        filename: item.filename,
+                      };
+                      formData.append("oldImages[]", JSON.stringify(item));
+                    }
                   });
 
-                  return;
-                }
-                formData.append("isOnlineProduct", data.isOnlineProduct);
-                formData.append("isKiotProduct", data.isKiotProduct);
-                formData.append("idOfKiot", data.idOfKiot);
-                formData.append("name", data.name);
-                formData.append("price", data.price);
-                formData.append("countInStock", data.countInStock);
-                formData.append("isBestSeller", data.isBestSeller);
-                formData.append("weight", data.weight);
-                formData.append(
-                  "dimension",
-                  `${data.length}|${data.width}|${data.height}`
-                );
-                formData.append("productDescription", data.productDescription);
-                formData.append("productDetails", data.productDetails);
+                  if (data.isKiotProduct == true && !data.idOfKiot) {
+                    toast({
+                      title: "you dont have Kiot",
+                    });
 
-                axios
-                  .post(
-                    `request-create-products/update/category/${data.idOfCategory}/${data.id}`,
-                    formData,
+                    return;
+                  }
+                  formData.append("isOnlineProduct", data.isOnlineProduct);
+                  formData.append("isKiotProduct", data.isKiotProduct);
+                  formData.append("idOfKiot", data.idOfKiot);
+                  formData.append("name", data.name);
+                  formData.append("price", data.price);
+                  formData.append("countInStock", data.countInStock);
+                  formData.append("isBestSeller", data.isBestSeller);
+                  formData.append("weight", data.weight);
+                  formData.append(
+                    "dimension",
+                    `${data.length}|${data.width}|${data.height}`
+                  );
+                  formData.append(
+                    "productDescription",
+                    data.productDescription
+                  );
+                  formData.append("productDetails", data.productDetails);
+
+                  axios
+                    .post(
+                      `request-create-products/update/category/${data.idOfCategory}/${data.id}`,
+                      formData,
+                      {
+                        headers: {
+                          "Content-Type": "multipart/form-data",
+                        },
+                      }
+                    )
+                    .then((res: any) => {
+                      if (res.code == 200) {
+                        toast({
+                          title: "Update Success",
+                        });
+                      } else {
+                        toast({
+                          title: "Update Fail",
+                        });
+                      }
+                    })
+                    .catch((e) => console.log(e));
+                } else {
+                  toast (
                     {
-                      headers: {
-                        "Content-Type": "multipart/form-data",
-                      },
+                      title: "You can't update this request",
                     }
                   )
-                  .then((res: any) => {
-                    if (res.code == 200) {
-                      toast({
-                        title: "Update Success",
-                      });
-                    } else {
-                      toast({
-                        title: "Update Fail",
-                      });
-                    }
-                  })
-                  .catch((e) => console.log(e));
+                }
               }}
             >
               <ImageInput source="image" label="Image" multiple>

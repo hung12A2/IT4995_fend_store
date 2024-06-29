@@ -78,7 +78,6 @@ const MenuItems = () => {
 };
 
 const MyAvatar = ({ avatar }: { avatar: string }) => {
-  console.log(avatar);
   return (
     <Avatar>
       <AvatarImage src={avatar}></AvatarImage>
@@ -111,7 +110,6 @@ const MyAppBar = (props: any) => {
         .then((res) => res.data)
         .catch((e) => console.log(e));
 
-      console.log(res);
       setListNoti(res);
     }
 

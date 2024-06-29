@@ -634,23 +634,23 @@ const ShopInfo = () => {
             <div className=" md:grid  md:grid-cols-2  flex flex-col gap-y-2 mt-4">
               <div>
                 Danh gia trung binh:{" "}
-                {roundToTwoDecimalPlaces(+shopInfo?.shopInfo?.avgRating)}
+                {roundToTwoDecimalPlaces(+shopInfo?.shopInfo?.avgRating || 0)}
               </div>
-              <div>So danh gia: {shopInfo?.shopInfo?.numberOfRating}</div>
-              <div>So san pham da ban: {shopInfo?.shopInfo?.numberOfSold}</div>
-              <div>So san pham: {shopInfo?.shopInfo?.numberOfProduct}</div>
-              <div>Tong so Order: {shopInfo?.shopInfo?.numberOfOrder}</div>
+              <div>So danh gia: {shopInfo?.shopInfo?.numberOfRating || 0}</div>
+              <div>So san pham da ban: {shopInfo?.shopInfo?.numberOfSold || 0}</div>
+              <div>So san pham: {shopInfo?.shopInfo?.numberOfProduct || 0}</div>
+              <div>Tong so Order: {shopInfo?.shopInfo?.numberOfOrder || 0 }</div>
               <div>
                 Tong so Order thanh cong:{" "}
-                {shopInfo?.shopInfo?.numberOfSuccesOrder}
+                {shopInfo?.shopInfo?.numberOfSuccesOrder || 0}
               </div>
               <div>
                 Tong so Order bi tra lai:{" "}
-                {shopInfo?.shopInfo?.numberOfReturnOrder}
+                {shopInfo?.shopInfo?.numberOfReturnOrder || 0}
               </div>
               <div>
                 Tong so Order da tu choi:{" "}
-                {shopInfo?.shopInfo?.numberOfRejectOrder}
+                {shopInfo?.shopInfo?.numberOfRejectOrder || 0}
               </div>
             </div>
           </>

@@ -4,6 +4,7 @@ import {
   DateField,
   DateInput,
   Form,
+  Logout,
   SelectInput,
   TextInput,
   useGetIdentity,
@@ -41,6 +42,17 @@ import { FormProvider, set, useForm } from "react-hook-form";
 import { authProvider } from "@/provider/authProvider";
 import { useRedirect } from "react-admin";
 import { RichTextInput } from "ra-input-rich-text";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { AlertDialogTitle } from "@radix-ui/react-alert-dialog";
 
 function roundToTwoDecimalPlaces(num: number) {
   return parseFloat(num.toFixed(2));
@@ -63,6 +75,7 @@ const KiotInfo = () => {
   const [seletedDistrict, setSeletedDistrict] = useState<any>();
   const [seletedProvince2, setSeletedProvince2] = useState<any>();
   const [seletedDistrict2, setSeletedDistrict2] = useState<any>();
+  const [ListAreas, setListAreas] = useState<any>([]);
 
   const [open, setOpen] = useState(false);
   const [open2, setOpen2] = useState(false);
@@ -142,13 +155,48 @@ const KiotInfo = () => {
       setListProvince(dataProvince);
     }
 
+    if (user?.idOfKiot) {
+      fetchData();
+    }
+  }, [user?.idOfKiot]);
+
+  useEffect(() => {
+    async function fetchData() {
+      let dataProvince = await axios
+        .post(`location/province`, {})
+        .then((res) => res.data)
+        .catch((e) => console.log(e));
+
+      dataProvince = dataProvince.map((item: any) => {
+        return {
+          provinceId: `${item.provinceName}-${item.provinceId}`,
+          provinceName: item.provinceName,
+        };
+      });
+
+      setListProvince(dataProvince);
+    }
+
+    fetchData();
+  }, [user?.idOfKiot]);
+
+  useEffect(() => {
+    async function fetchData() {
+      let dataAreas = await axios
+        .get(`areas`)
+        .then((res) => res)
+        .catch((e) => console.log(e));
+
+      setListAreas(dataAreas);
+    }
+
     fetchData();
   }, []);
 
   useEffect(() => {
     async function fetchData() {
       let dataDistrict = await axios
-        .post(`location/district/${seletedProvince.split("-")[1]}`, {})
+        .post(`location/district/${seletedProvince?.split("-")[1]}`, {})
         .then((res) => res.data)
         .catch((e) => console.log(e));
 
@@ -168,7 +216,7 @@ const KiotInfo = () => {
   useEffect(() => {
     async function fetchData() {
       let dataDistrict = await axios
-        .post(`location/district/${seletedProvince2.split("-")[1]}`, {})
+        .post(`location/district/${seletedProvince2?.split("-")[1]}`, {})
         .then((res) => res.data)
         .catch((e) => console.log(e));
 
@@ -188,11 +236,11 @@ const KiotInfo = () => {
   useEffect(() => {
     async function fetchData() {
       let dataWard = await axios
-        .post(`location/ward/${seletedDistrict.split("-")[1]}`, {})
+        .post(`location/ward/${seletedDistrict?.split("-")[1]}`, {})
         .then((res) => res.data)
         .catch((e) => console.log(e));
 
-      dataWard = dataWard.map((item: any) => {
+      dataWard = dataWard?.map((item: any) => {
         return {
           wardCode: `${item.wardName}-${item.wardCode}`,
           wardName: item.wardName,
@@ -207,11 +255,11 @@ const KiotInfo = () => {
   useEffect(() => {
     async function fetchData() {
       let dataWard = await axios
-        .post(`location/ward/${seletedDistrict2.split("-")[1]}`, {})
+        .post(`location/ward/${seletedDistrict2?.split("-")[1]}`, {})
         .then((res) => res.data)
         .catch((e) => console.log(e));
 
-      dataWard = dataWard.map((item: any) => {
+      dataWard = dataWard?.map((item: any) => {
         return {
           wardCode: `${item.wardName}-${item.wardCode}`,
           wardName: item.wardName,
@@ -225,6 +273,136 @@ const KiotInfo = () => {
   }, [seletedDistrict2]);
 
   if (isLoading) return <div>Loading...</div>;
+
+  if (!user?.idOfKiot) {
+    return (
+      <div className="flex flex-col">
+        <div className="mt-8 pb-6 border-b-[1px] border-gray-400 text-xl font-medium text-blue-700">
+          Tao Kiot
+        </div>
+        <Form
+          className="grid grid-cols-1 px-4 mt-6 gap-y-3"
+          defaultValues={kiotInfo?.kiot}
+          onSubmit={async (data: any) => {
+            const {
+              name,
+              description,
+              pickUpAddress,
+              returnAddress,
+              pickUpProvince,
+              returnProvince,
+              pickUpDistrict,
+              returnDistrict,
+              pickUpWard,
+              returnWard,
+              phoneNumber,
+              idOfArea,
+              email
+            } = data;
+
+            const dataReturn: any = await axios.post(
+              `kiots/create/area/${idOfArea}`,
+              {
+                name,
+                description,
+                pickUpAddress,
+                returnAddress,
+                pickUpProvince,
+                returnProvince,
+                pickUpDistrict,
+                returnDistrict,
+                pickUpWard,
+                returnWard,
+                phoneNumber,
+                email
+              }
+            );
+
+            if (dataReturn.id) {
+              toast({
+                title: "Tao Kiot thanh cong",
+                description: `Tao Kiot thanh cong luc ${new Date().toLocaleString()}.`,
+              });
+
+              authProvider.logout("logout");
+              redirect("/login");
+            } else {
+              toast({
+                title: "Tao Kiot that bai",
+                description: `Tao Kiot that bai luc ${new Date().toLocaleString()}.`,
+              });
+            }
+          }}
+        >
+          <TextInput label="Ten kiot" source="name"></TextInput>
+          <TextInput source="phoneNumber"></TextInput>
+          <TextInput source="email"></TextInput>
+          <RichTextInput source="description"></RichTextInput>
+          <TextInput source="phoneNumber"></TextInput>
+          <TextInput source="pickUpAddress"></TextInput>
+          <SelectInput
+            label="Khu vuc"
+            source="idOfArea"
+            choices={ListAreas}
+            optionText="name"
+            optionValue="id"
+          ></SelectInput>
+          <SelectInput
+            source="pickUpProvince"
+            choices={listProvince}
+            optionText="provinceName"
+            optionValue="provinceId"
+            onChange={(e) => {
+              setSeletedProvince(e.target.value);
+            }}
+          ></SelectInput>
+          <SelectInput
+            source="pickUpDistrict"
+            choices={listDistrict}
+            optionText="districtName"
+            optionValue="districtId"
+            onChange={(e) => {
+              console.log(e.target.value);
+              setSeletedDistrict(e.target.value);
+            }}
+          ></SelectInput>
+          <SelectInput
+            source="pickUpWard"
+            choices={listWard}
+            optionText="wardName"
+            optionValue="wardCode"
+          ></SelectInput>
+          <TextInput source="returnAddress"></TextInput>
+          <SelectInput
+            source="returnProvince"
+            choices={listProvince}
+            optionText="provinceName"
+            optionValue="provinceId"
+            onChange={(e) => {
+              setSeletedProvince2(e.target.value);
+            }}
+          ></SelectInput>
+          <SelectInput
+            source="returnDistrict"
+            choices={listDistrict2}
+            optionText="districtName"
+            optionValue="districtId"
+            onChange={(e) => {
+              console.log(e.target.value);
+              setSeletedDistrict2(e.target.value);
+            }}
+          ></SelectInput>
+          <SelectInput
+            source="returnWard"
+            choices={listWard2}
+            optionText="wardName"
+            optionValue="wardCode"
+          ></SelectInput>
+          <Button>Submit</Button>
+        </Form>
+      </div>
+    );
+  }
 
   if (user?.role != "customer") {
     return (
@@ -399,25 +577,25 @@ const KiotInfo = () => {
               <div className=" md:grid  md:grid-cols-2  flex flex-col gap-y-2 mt-4">
                 <div>
                   Danh gia trung binh:{" "}
-                  {roundToTwoDecimalPlaces(+kiotInfo?.kiotInfo?.avgRating)}
+                  {roundToTwoDecimalPlaces(+kiotInfo?.kiotInfo?.avgRating) || 0}
                 </div>
-                <div>So danh gia: {kiotInfo?.kiotInfo?.numberOfRating}</div>
+                <div>So danh gia: {kiotInfo?.kiotInfo?.numberOfRating || 0}</div>
                 <div>
-                  So san pham da ban: {kiotInfo?.kiotInfo?.numberOfSold}
+                  So san pham da ban: {kiotInfo?.kiotInfo?.numberOfSold || 0}
                 </div>
-                <div>So san pham: {kiotInfo?.kiotInfo?.numberOfProduct}</div>
-                <div>Tong so Order: {kiotInfo?.kiotInfo?.numberOfOrder}</div>
+                <div>So san pham: {kiotInfo?.kiotInfo?.numberOfProduct || 0}</div>
+                <div>Tong so Order: {kiotInfo?.kiotInfo?.numberOfOrder || 0}</div>
                 <div>
                   Tong so Order thanh cong:{" "}
-                  {kiotInfo?.kiotInfo?.numberOfSuccesOrder}
+                  {kiotInfo?.kiotInfo?.numberOfSuccesOrder || 0}
                 </div>
                 <div>
                   Tong so Order bi tra lai:{" "}
-                  {kiotInfo?.kiotInfo?.numberOfReturnOrder}
+                  {kiotInfo?.kiotInfo?.numberOfReturnOrder || 0}
                 </div>
                 <div>
                   Tong so Order da tu choi:{" "}
-                  {kiotInfo?.kiotInfo?.numberOfRejectOrder}
+                  {kiotInfo?.kiotInfo?.numberOfRejectOrder || 0}
                 </div>
               </div>
             </>
@@ -632,23 +810,23 @@ const KiotInfo = () => {
             <div className=" md:grid  md:grid-cols-2  flex flex-col gap-y-2 mt-4">
               <div>
                 Danh gia trung binh:{" "}
-                {roundToTwoDecimalPlaces(+kiotInfo?.kiotInfo?.avgRating)}
+                {roundToTwoDecimalPlaces(+kiotInfo?.kiotInfo?.avgRating) || 0}
               </div>
-              <div>So danh gia: {kiotInfo?.kiotInfo?.numberOfRating}</div>
-              <div>So san pham da ban: {kiotInfo?.kiotInfo?.numberOfSold}</div>
-              <div>So san pham: {kiotInfo?.kiotInfo?.numberOfProduct}</div>
-              <div>Tong so Order: {kiotInfo?.kiotInfo?.numberOfOrder}</div>
+              <div>So danh gia: {kiotInfo?.kiotInfo?.numberOfRating || 0}</div>
+              <div>So san pham da ban: {kiotInfo?.kiotInfo?.numberOfSold || 0}</div>
+              <div>So san pham: {kiotInfo?.kiotInfo?.numberOfProduct || 0}</div>
+              <div>Tong so Order: {kiotInfo?.kiotInfo?.numberOfOrder || 0}</div>
               <div>
                 Tong so Order thanh cong:{" "}
-                {kiotInfo?.kiotInfo?.numberOfSuccesOrder}
+                {kiotInfo?.kiotInfo?.numberOfSuccesOrder || 0}
               </div>
               <div>
                 Tong so Order bi tra lai:{" "}
-                {kiotInfo?.kiotInfo?.numberOfReturnOrder}
+                {kiotInfo?.kiotInfo?.numberOfReturnOrder || 0}
               </div>
               <div>
                 Tong so Order da tu choi:{" "}
-                {kiotInfo?.kiotInfo?.numberOfRejectOrder}
+                {kiotInfo?.kiotInfo?.numberOfRejectOrder || 0}
               </div>
             </div>
           </>
@@ -690,7 +868,7 @@ const KiotInfo = () => {
               pickUpWard,
               returnWard,
               phoneNumber,
-              idOfArea
+              idOfArea,
             });
 
             if (dataReturn.id) {

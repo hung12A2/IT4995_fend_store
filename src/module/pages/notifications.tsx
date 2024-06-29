@@ -37,7 +37,6 @@ export default function Home() {
         .then((res) => res.data)
         .catch((e) => console.log(e));
 
-      console.log(res);
       setListNoti(res);
     }
 
