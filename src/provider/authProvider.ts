@@ -50,9 +50,22 @@ const checkAuth = (params: any) => {
   const { status } = user;
   console.log(status);
 
+  if (!user) {
+    return Promise.reject({
+      message: "Error: User not found",
+    });
+  }
+
   if (status !== "active") {
     return Promise.reject({
       message: "User not active",
+    });
+  }
+
+
+  if (! user?.idOfShop) {
+    return Promise.reject({
+      message: "User dont have shop yet",
     });
   }
 

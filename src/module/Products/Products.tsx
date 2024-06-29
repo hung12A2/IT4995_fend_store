@@ -163,12 +163,11 @@ export const ListProducts = (props: any) => {
                               )
                               .then((res) => res.data)
                               .catch((e) => console.log(e));
-
                             console.log(dataFetch);
-                            if (dataFetch.code == 200)
-                              toast({
-                                title: "Ban success",
-                              });
+
+                            toast({
+                              title: "Ban success",
+                            });
 
                             refresh();
                           }}
@@ -190,7 +189,7 @@ export const ListProducts = (props: any) => {
                     <AlertDialogContent>
                       <AlertDialogHeader>
                         <AlertDialogDescription>
-                          Are you sure you want unban this user ?
+                          Are you sure you want unban this product ?
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
@@ -210,12 +209,9 @@ export const ListProducts = (props: any) => {
                               .then((res) => res.data)
                               .catch((e) => console.log(e));
 
-                            console.log(dataFetch);
-
-                            if (dataFetch.code == 200)
-                              toast({
-                                title: "UnBun success",
-                              });
+                            toast({
+                              title: "UnBun success",
+                            });
 
                             refresh();
                           }}
@@ -395,7 +391,11 @@ export const ShowProducts = (props: any) => {
 
                 <NumberInput source="price" label="price" />
 
-                <NumberInput source="countInStock" label="countInStock" disabled/>
+                <NumberInput
+                  source="countInStock"
+                  label="countInStock"
+                  disabled
+                />
 
                 <TextInput source="status" label="Status" disabled={true} />
 

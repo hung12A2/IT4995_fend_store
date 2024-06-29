@@ -192,14 +192,14 @@ export const ListOrdersKiot = (props: any) => {
                   </AlertDialog>
                   <AlertDialog>
                     <AlertDialogTrigger>
-                      <div className="bg-blue-300 hover:bg-blue-400 hover:cursor-grab px-4 py-2 rounded-md">
-                        accepted
+                      <div className="bg-red-300 hover:bg-red-400 hover:cursor-grab px-4 py-2 rounded-md">
+                        Rejected
                       </div>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
                         <AlertDialogDescription>
-                          Are you sure you want ban this user ?
+                          Are you sure you want reject this order ?
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
@@ -208,7 +208,7 @@ export const ListOrdersKiot = (props: any) => {
                           onClick={async () => {
                             const dataFetch = await axios
                               .post(
-                                `${BASE_URL}admins/banned/${id}`,
+                                `${BASE_URL}order-kiot/rejected/order/${id}`,
                                 {},
                                 {
                                   headers: {
