@@ -4,7 +4,12 @@ import ListAltIcon from "@mui/icons-material/ListAlt";
 import { useEffect, useState } from "react";
 import axios from "../AxiosCustom/custome_Axios";
 import { set } from "react-hook-form";
-import { useAuthProvider, useDataProvider, useGetIdentity, useRedirect } from "react-admin";
+import {
+  useAuthProvider,
+  useDataProvider,
+  useGetIdentity,
+  useRedirect,
+} from "react-admin";
 import {
   Bar,
   BarChart,
@@ -203,12 +208,12 @@ export const CustomDash = () => {
             </div>
 
             <div className="px-4 py-2 flex flex-col gap-y-2 text-lg ">
-              <div className="flex justify-end">Revenue 10days</div>
-              <div className="flex justify-end">{revenue} dong</div>
+              <div className="flex justify-end">Thu nhập 10 ngày gần nhất</div>
+              <div className="flex justify-end">{revenue} đồng</div>
             </div>
           </div>
           <div className="w-full mt-4  border-2 border-gray-200 rounded-lg pb-6">
-            <div className="m-4">Top10 Best seller</div>
+            <div className="m-4">10 sản phẩm bán chạy nhất</div>
             <div className="flex flex-col gap-y-4 w-full ">
               {listProducts.map((product: any) => (
                 <div
@@ -221,9 +226,10 @@ export const CustomDash = () => {
                     className=" rounded-full w-12 h-12 object-cover "
                   />
                   <div className="flex flex-col">
-                    <div>name: {product.name}</div>
+                    <div>Tên: {product.name}</div>
                     <div className="flex flex-row justify-end">
-                      sold: {product.numberOfSold ? product.numberOfSold : 0}
+                      Số lượng đã bán:
+                      {product.numberOfSold ? product.numberOfSold : 0}
                     </div>
                   </div>
                 </div>
@@ -245,12 +251,12 @@ export const CustomDash = () => {
             </div>
 
             <div className="px-4 py-2 flex flex-col gap-y-2 text-lg ">
-              <div className="flex justify-end">New pending orders</div>
+              <div className="flex justify-end">Đơn hàng mới</div>
               <div className="flex justify-end">{ListOrders?.length || 0}</div>
             </div>
           </div>
           <div className="w-full mt-4  border-2 border-gray-200 rounded-lg pb-6">
-            <div className="m-4">New pending orders</div>
+            <div className="m-4">Danh sách đơn hàng mới</div>
             <div>
               {ListOrders.map((order: any) => (
                 <div
@@ -264,10 +270,10 @@ export const CustomDash = () => {
                   />
                   <div className="flex flex-col">
                     <div className="flex flex-row justify-end">
-                      created By: {order.userName}
+                      Tạo bởi: {order.userName}
                     </div>
                     <div className="flex flex-row justify-end">
-                      time: {formatDateTime(order.createdAt)}
+                      Thời gian: {formatDateTime(order.createdAt)}
                     </div>
                   </div>
                 </div>
@@ -289,14 +295,14 @@ export const CustomDash = () => {
             </div>
 
             <div className="px-4 py-2 flex flex-col gap-y-2 text-lg ">
-              <div className="flex justify-end">New pending orders Kiot</div>
+              <div className="flex justify-end">Đơn hàng kiot mới</div>
               <div className="flex justify-end">
                 {ListOrdersKiot?.length || 0}
               </div>
             </div>
           </div>
           <div className="w-full mt-4  border-2 border-gray-200 rounded-lg pb-6">
-            <div className="m-4">New pending orders Kiot</div>
+            <div className="m-4">Danh sách đơn hàng mới</div>
             <div>
               {ListOrdersKiot.map((order: any) => (
                 <div
@@ -310,10 +316,10 @@ export const CustomDash = () => {
                   />
                   <div className="flex flex-col">
                     <div className="flex flex-row justify-end">
-                      created By: {order.userName}
+                      Tạo bởi: {order.userName}
                     </div>
                     <div className="flex flex-row justify-end">
-                      time: {formatDateTime(order.createdAt)}
+                      Thời gian: {formatDateTime(order.createdAt)}
                     </div>
                   </div>
                 </div>
@@ -335,17 +341,16 @@ export const CustomDash = () => {
             </div>
 
             <div className="px-4 py-2 flex flex-col gap-y-2 text-lg ">
-              <div className="flex justify-end">New Rating</div>
+              <div className="flex justify-end">Đánh giá mới</div>
               <div className="flex justify-end">{ListRating?.length || 0}</div>
             </div>
           </div>
           <div className="w-full mt-4  border-2 border-gray-200 rounded-lg pb-6">
-            <div className="m-4">New Rating</div>
+            <div className="m-4">Danh sách đánh giá mới</div>
             <div>
               {ListRating.map((rating: any) => (
                 <div
-                onClick={() => redirect(`/ratingsForShop/${rating.id}`)}
-
+                  onClick={() => redirect(`/ratingsForShop/${rating.id}`)}
                   className="flex flex-row justify-between 	w-full border-b-2 border-gray-2 hover:bg-gray-100 px-4 rouded-lg py-2 hover:cursor-grab"
                   key={rating.id}
                 >
@@ -358,7 +363,7 @@ export const CustomDash = () => {
                       {rating.comment}
                     </div>
                     <div className="flex flex-row justify-end">
-                      rating: {rating.rating}
+                    Đánh giá: {rating.rating}
                     </div>
                   </div>
                 </div>
@@ -370,7 +375,7 @@ export const CustomDash = () => {
 
       <div className="flex flex-row">
         <div className="w-1/2 py-4  rounded-lg border-2 border-gray-100">
-          <div className="ml-4 mt-2">Orders in 10 days</div>
+          <div className="ml-4 mt-2">Thống kê đơn hàng trong 10 ngày gần nhất</div>
           <BarChart width={730} height={250} data={data} className="mt-4">
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" />
@@ -383,7 +388,7 @@ export const CustomDash = () => {
         </div>
 
         <div className="w-1/2 py-4  rounded-lg border-2 border-gray-100">
-          <div className="ml-4 mt-2">Orders kiot in 10 days</div>
+          <div className="ml-4 mt-2">Thống kê đơn hàng kiot trong 10 ngày gần nhất</div>
           <BarChart width={730} height={250} data={dataKiot} className="mt-4">
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" />
@@ -398,7 +403,7 @@ export const CustomDash = () => {
 
       <div className=" flex flex-row">
         <div className="w-1/2 py-4  rounded-lg border-2 border-gray-100">
-          <div className="ml-4 mt-2">Transaction in 10 days</div>
+          <div className="ml-4 mt-2">Giao dịch trong 10 ngày gần nhất</div>
           <BarChart
             width={730}
             height={250}

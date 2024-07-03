@@ -89,7 +89,7 @@ export const ListRequestProducts = (props: any) => {
   if (checkPermission("Products-Managment", user?.permissions) == false) {
     return (
       <div className="w-full h-[50vh] flex flex-col items-center justify-center text-xl font-medium">
-        Ban khong co quyen truy cap
+        Bạn không có quyền truy cập
       </div>
     );
   }
@@ -166,7 +166,7 @@ export const CreateRequestProducts = (props: any) => {
   if (checkPermission("Products-Managment", user?.permissions) == false) {
     return (
       <div className="w-full h-[50vh] flex flex-col items-center justify-center text-xl font-medium">
-        Ban khong co quyen truy cap
+        Bạn không có quyền truy cập
       </div>
     );
   }
@@ -179,7 +179,7 @@ export const CreateRequestProducts = (props: any) => {
           let formData = new FormData();
           if (!data.image) {
             toast({
-              title: "Please upload image",
+              title: "Hãy upload thêm ảnh",
             });
 
             return;
@@ -196,16 +196,16 @@ export const CreateRequestProducts = (props: any) => {
             }
           });
 
-          if (data.isKiotProduct == true && !data.idOfKiot) {
+          if (data.isKiotProduct == true && !user.idOfKiot) {
             toast({
-              title: "you dont have Kiot",
+              title: "Bạn không có Kiot",
             });
 
             return;
           }
           formData.append("isOnlineProduct", data.isOnlineProduct);
           formData.append("isKiotProduct", data.isKiotProduct);
-          formData.append("idOfKiot", data.idOfKiot);
+          formData.append("idOfKiot", user.idOfKiot);
           formData.append("name", data.name);
           formData.append("price", data.price);
           formData.append("countInStock", data.countInStock);
@@ -231,11 +231,11 @@ export const CreateRequestProducts = (props: any) => {
             .then((res: any) => {
               if (res?.id) {
                 toast({
-                  title: "Create Success",
+                  title: "Tạo yêu cầu thành công",
                 });
               } else {
                 toast({
-                  title: "Create Fail",
+                  title: "Tạo yêu cầu thất bại",
                 });
               }
             })
@@ -276,7 +276,7 @@ export const CreateRequestProducts = (props: any) => {
             choices={listCate}
           />
 
-          <NumberInput source="weight" label="Weight (kg)" />
+          <NumberInput source="weight" label="Weight (gram)" />
 
           <NumberInput source="length" label="Length (cm)" />
           <NumberInput source="width" label="Width (cm)" />
@@ -346,7 +346,7 @@ export const ShowRequest = (props: any) => {
   if (checkPermission("Products-Managment", user?.permissions) == false) {
     return (
       <div className="w-full h-[50vh] flex flex-col items-center justify-center text-xl font-medium">
-        Ban khong co quyen truy cap
+        Bạn không có quyền truy cập
       </div>
     );
   }
@@ -374,16 +374,16 @@ export const ShowRequest = (props: any) => {
                     }
                   });
 
-                  if (data.isKiotProduct == true && !data.idOfKiot) {
+                  if (data.isKiotProduct == true && !user?.idOfKiot) {
                     toast({
-                      title: "you dont have Kiot",
+                      title: "Bạn không có Kiot",
                     });
 
                     return;
                   }
                   formData.append("isOnlineProduct", data.isOnlineProduct);
                   formData.append("isKiotProduct", data.isKiotProduct);
-                  formData.append("idOfKiot", data.idOfKiot);
+                  formData.append("idOfKiot", user?.idOfKiot);
                   formData.append("name", data.name);
                   formData.append("price", data.price);
                   formData.append("countInStock", data.countInStock);
@@ -412,11 +412,11 @@ export const ShowRequest = (props: any) => {
                     .then((res: any) => {
                       if (res.code == 200) {
                         toast({
-                          title: "Update Success",
+                          title: "Cập nhập thành công",
                         });
                       } else {
                         toast({
-                          title: "Update Fail",
+                          title: "Cập nhập thất bại",
                         });
                       }
                     })
@@ -424,7 +424,7 @@ export const ShowRequest = (props: any) => {
                 } else {
                   toast (
                     {
-                      title: "You can't update this request",
+                      title: "Bạn không thể cập nhập yêu cầu đã được xử lý",
                     }
                   )
                 }

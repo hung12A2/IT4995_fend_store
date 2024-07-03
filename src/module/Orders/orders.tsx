@@ -80,11 +80,10 @@ export const ListOrder = (props: any) => {
   const { data } = useGetIdentity();
   const user = data?.user;
 
-
   if (checkPermission("Orders-Managment", user?.permissions) == false) {
     return (
       <div className="w-full h-[50vh] flex flex-col items-center justify-center text-xl font-medium">
-        Ban khong co quyen truy cap
+        Bạn không có quyền truy cập
       </div>
     );
   }
@@ -101,6 +100,7 @@ export const ListOrder = (props: any) => {
         <NumberField source="codAmount" />
         <TextField source="status" />
         <TextField source="paymentMethod" />
+        <DateField source="createdAt" />
         <TextField source="requiredNote" />
         <FunctionField
           render={(record: any) => {
@@ -121,13 +121,13 @@ export const ListOrder = (props: any) => {
                   <AlertDialog>
                     <AlertDialogTrigger>
                       <div className="bg-blue-300 hover:bg-blue-400 hover:cursor-grab px-4 py-2 rounded-md">
-                        Accepted
+                        Chấp nhận
                       </div>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
                         <AlertDialogTitle>
-                          Are you sure you accept this order ?
+                          Bạn có muốn chấp nhận đơn hàng này ?
                         </AlertDialogTitle>
                       </AlertDialogHeader>
                       <AlertDialogDescription>
@@ -161,7 +161,7 @@ export const ListOrder = (props: any) => {
                         </FormProvider>
                       </AlertDialogDescription>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>Hủy</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={handleSubmit(async (data) => {
                             data = {
@@ -183,7 +183,7 @@ export const ListOrder = (props: any) => {
                             }
                           })}
                         >
-                          YES
+                          Chấp nhận
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
@@ -191,17 +191,17 @@ export const ListOrder = (props: any) => {
                   <AlertDialog>
                     <AlertDialogTrigger>
                       <div className="bg-red-300 hover:bg-red-400 hover:cursor-grab px-4 py-2 rounded-md">
-                        Reject
+                        Từ chối
                       </div>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
                         <AlertDialogDescription>
-                          Are you sure you want reject this order ?
+                          Bạn có chắc muốn từ chối đơn hàng này ?
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>Hủy</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={async () => {
                             const dataFetch = await axios
@@ -225,7 +225,7 @@ export const ListOrder = (props: any) => {
                             refresh();
                           }}
                         >
-                          YES
+                          Đồng ý
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
@@ -237,18 +237,21 @@ export const ListOrder = (props: any) => {
                 <AlertDialog>
                   <AlertDialogTrigger>
                     <div className="bg-blue-300 hover:bg-blue-400 hover:cursor-grab px-4 py-2 rounded-md">
-                      Prepared
+                      Chuẩn bị xong
                     </div>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Bạn đã chuẩn bị xong đơn hàng
+                      </AlertDialogTitle>
                       <AlertDialogDescription>
                         Ban da chuan bi xong don hang nay ? neu roi thi don vi
                         van chuyen se den lay hang
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogCancel>Hủy</AlertDialogCancel>
                       <AlertDialogAction
                         onClick={async () => {
                           const dataFetch = await axios
@@ -267,7 +270,7 @@ export const ListOrder = (props: any) => {
                           }
                         }}
                       >
-                        YES
+                        Đồng ý
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
@@ -278,17 +281,17 @@ export const ListOrder = (props: any) => {
                 <AlertDialog>
                   <AlertDialogTrigger>
                     <div className="bg-blue-300 hover:bg-blue-400 hover:cursor-grab px-4 py-2 rounded-md">
-                      Transisted
+                      Đang vận chuyển
                     </div>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
                       <AlertDialogDescription>
-                        Don hang da duoc ban giao cho don vi van chuyen
+                        Đơn hàng đã được bàn giao cho đơn vị vận chuyển
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogCancel>Hủy</AlertDialogCancel>
                       <AlertDialogAction
                         onClick={async () => {
                           const dataFetch = await axios
@@ -309,7 +312,7 @@ export const ListOrder = (props: any) => {
                           }
                         }}
                       >
-                        YES
+                        Đồng ý
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
@@ -320,7 +323,7 @@ export const ListOrder = (props: any) => {
                 <AlertDialog>
                   <AlertDialogTrigger>
                     <div className="bg-blue-300 hover:bg-blue-400 hover:cursor-grab px-4 py-2 rounded-md">
-                      Transisted to user
+                      Đến người dùng
                     </div>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
@@ -330,7 +333,7 @@ export const ListOrder = (props: any) => {
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogCancel>Hủy</AlertDialogCancel>
                       <AlertDialogAction
                         onClick={async () => {
                           const dataFetch = await axios
@@ -349,7 +352,7 @@ export const ListOrder = (props: any) => {
                           }
                         }}
                       >
-                        YES
+                        Đồng ý
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
@@ -360,7 +363,7 @@ export const ListOrder = (props: any) => {
                 <AlertDialog>
                   <AlertDialogTrigger>
                     <div className="bg-blue-300 hover:bg-blue-400 hover:cursor-grab px-4 py-2 rounded-md">
-                      Delivered
+                      Đã vận chuyển
                     </div>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
@@ -370,7 +373,7 @@ export const ListOrder = (props: any) => {
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogCancel>Hủy</AlertDialogCancel>
                       <AlertDialogAction
                         onClick={async () => {
                           const dataFetch = await axios
@@ -389,7 +392,7 @@ export const ListOrder = (props: any) => {
                           }
                         }}
                       >
-                        YES
+                        Đồng ý
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
@@ -405,15 +408,13 @@ export const ListOrder = (props: any) => {
 };
 
 export const ShowOrder = (props: any) => {
-
   const { data } = useGetIdentity();
   const user = data?.user;
-
 
   if (checkPermission("Orders-Managment", user?.permissions) == false) {
     return (
       <div className="w-full h-[50vh] flex flex-col items-center justify-center text-xl font-medium">
-        Ban khong co quyen truy cap
+        Bạn không có quyền truy cập
       </div>
     );
   }

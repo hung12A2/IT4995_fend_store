@@ -64,7 +64,7 @@ export const ListAddForm = (props: any) => {
   if (checkPermission("Products-Managment", user?.permissions) == false) {
     return (
       <div className="w-full h-[50vh] flex flex-col items-center justify-center text-xl font-medium">
-        Ban khong co quyen truy cap
+       Bạn không có quyền truy cập
       </div>
     );
   }
@@ -110,7 +110,7 @@ export const AddImportForm = (props: any) => {
   if (checkPermission("Products-Managment", user?.permissions) == false) {
     return (
       <div className="w-full h-[50vh] flex flex-col items-center justify-center text-xl font-medium">
-        Ban khong co quyen truy cap
+        Bạn không có quyền truy cập
       </div>
     );
   }
@@ -168,7 +168,7 @@ export const ShowAddForm = (props: any) => {
   if (checkPermission("Products-Managment", user?.permissions) == false) {
     return (
       <div className="w-full h-[50vh] flex flex-col items-center justify-center text-xl font-medium">
-        Ban khong co quyen truy cap
+        Bạn không có quyền truy cập
       </div>
     );
   }
@@ -250,7 +250,7 @@ export const ShowAddForm = (props: any) => {
                         source="weight"
                         label="Shop name"
                         render={(record: any) => {
-                          return <div>{record.weight} kg</div>;
+                          return <div>{record.weight} gram</div>;
                         }}
                       />
                     </div>

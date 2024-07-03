@@ -77,11 +77,11 @@ export const ListEmployee = (props: any) => {
   if (checkPermission("all", user?.permissions) == false) {
     return (
       <div className="w-full h-[50vh] flex flex-col items-center justify-center text-xl font-medium">
-        Ban khong co quyen truy cap
+        Bạn không có quyền truy cập
       </div>
     );
   }
-  
+
   return (
     <>
       <Chat />
@@ -304,7 +304,7 @@ export const ShowEmployee = (props: any) => {
               // eslint-disable-next-line jsx-a11y/alt-text
               <div className="flex flex-row gap-x-6">
                 <div className="flex flex-col w-1/3 justify-center">
-                  <div className="flex justify-center mb-4 ">Avatar</div>
+                  <div className="flex justify-center mb-4 ">Ảnh đại diện </div>
                   {url ? (
                     // eslint-disable-next-line jsx-a11y/alt-text, @next/next/no-img-element
                     <img src={url} className="w-full"></img>
@@ -317,7 +317,7 @@ export const ShowEmployee = (props: any) => {
                   )}
                 </div>
                 <div className="flex flex-col w-2/3 justify-center">
-                  <div className="flex justify-center mb-4">Cover Image</div>
+                  <div className="flex justify-center mb-4">Ảnh bìa</div>
                   {coverUrl ? (
                     // eslint-disable-next-line jsx-a11y/alt-text, @next/next/no-img-element
                     <img src={coverUrl} className="w-full"></img>
@@ -394,7 +394,7 @@ export const ShowEmployee = (props: any) => {
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogDescription>
-                      Please input your password to show
+                      Nhập mật khẩu của bạn
                       <Form
                         onSubmit={(data) => {
                           const yourPassword = data.yourPassword;
@@ -402,11 +402,11 @@ export const ShowEmployee = (props: any) => {
                             setCheckedPassword(true);
                             setOpen(false);
                             toast({
-                              title: "Your password is correct",
+                              title: "Mật khẩu chính xác",
                             });
                           } else {
                             toast({
-                              title: "Your password is incorrect",
+                              title: "Mật khẩu sai",
                             });
                           }
                         }}
@@ -416,9 +416,9 @@ export const ShowEmployee = (props: any) => {
                           source="yourPassword"
                         />
                         <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogCancel>Hủy</AlertDialogCancel>
                           <AlertDialogAction>
-                            <Button>Yes</Button>
+                            <Button>Đồng ý</Button>
                           </AlertDialogAction>
                         </AlertDialogFooter>
                       </Form>
@@ -445,11 +445,11 @@ export const ShowEmployee = (props: any) => {
 
           if (dataFetch.code == 200) {
             toast({
-              title: "Update success",
+              title: "Cập nhập thành công",
             });
           } else {
             toast({
-              title: "Update fail",
+              title: "Cập nhập thất bại",
             });
           }
         }}
@@ -490,11 +490,11 @@ export const createEmployee = (props: any) => {
 
           if (dataFetch.code == 200) {
             toast({
-              title: "Create success",
+              title: "Tạo người làm mới thành công ",
             });
           } else {
             toast({
-              title: "Create fail",
+              title: "Tạo người làm mới thất bại",
             });
           }
         }}

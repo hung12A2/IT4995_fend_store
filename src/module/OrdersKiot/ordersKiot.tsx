@@ -76,11 +76,10 @@ export const ListOrdersKiot = (props: any) => {
   const refresh = useRefresh();
   const formProvider = useForm({});
   const { handleSubmit } = formProvider;
-  
+
   const { data } = useGetIdentity();
 
   const user = data?.user;
-
 
   if (checkPermission("OrdersKiot-Managment", user?.permissions) == false) {
     return (
@@ -103,6 +102,7 @@ export const ListOrdersKiot = (props: any) => {
         <TextField source="status" />
         <TextField source="paymentMethod" />
         <TextField source="requiredNote" />
+        <DateField source="createdAt" />
         <EditButton label="Details" />
         <FunctionField
           render={(record: any) => {
@@ -123,13 +123,13 @@ export const ListOrdersKiot = (props: any) => {
                   <AlertDialog>
                     <AlertDialogTrigger>
                       <div className="bg-blue-300 hover:bg-blue-400 hover:cursor-grab px-4 py-2 rounded-md">
-                        Accepted
+                        Chấp nhận
                       </div>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
                         <AlertDialogTitle>
-                          Are you sure you accept this order ?
+                          Bạn có muốn chấp nhận đơn hàng này ?
                         </AlertDialogTitle>
                       </AlertDialogHeader>
                       <AlertDialogDescription>
@@ -163,7 +163,7 @@ export const ListOrdersKiot = (props: any) => {
                         </FormProvider>
                       </AlertDialogDescription>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>Hủy</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={handleSubmit(async (data) => {
                             data = {
@@ -185,7 +185,7 @@ export const ListOrdersKiot = (props: any) => {
                             }
                           })}
                         >
-                          YES
+                          Chấp nhận
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
@@ -193,17 +193,17 @@ export const ListOrdersKiot = (props: any) => {
                   <AlertDialog>
                     <AlertDialogTrigger>
                       <div className="bg-red-300 hover:bg-red-400 hover:cursor-grab px-4 py-2 rounded-md">
-                        Rejected
+                        Từ chối
                       </div>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
                         <AlertDialogDescription>
-                          Are you sure you want reject this order ?
+                          Bạn có chắc muốn từ chối đơn hàng này ?
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>Hủy</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={async () => {
                             const dataFetch = await axios
@@ -227,7 +227,7 @@ export const ListOrdersKiot = (props: any) => {
                             refresh();
                           }}
                         >
-                          YES
+                          Đồng ý
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
@@ -239,18 +239,21 @@ export const ListOrdersKiot = (props: any) => {
                 <AlertDialog>
                   <AlertDialogTrigger>
                     <div className="bg-blue-300 hover:bg-blue-400 hover:cursor-grab px-4 py-2 rounded-md">
-                      Prepared
+                      Chuẩn bị xong
                     </div>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Bạn đã chuẩn bị xong đơn hàng
+                      </AlertDialogTitle>
                       <AlertDialogDescription>
                         Ban da chuan bi xong don hang nay ? neu roi thi don vi
                         van chuyen se den lay hang
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogCancel>Hủy</AlertDialogCancel>
                       <AlertDialogAction
                         onClick={async () => {
                           const dataFetch = await axios
@@ -269,7 +272,7 @@ export const ListOrdersKiot = (props: any) => {
                           }
                         }}
                       >
-                        YES
+                        Đồng ý
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
@@ -280,7 +283,7 @@ export const ListOrdersKiot = (props: any) => {
                 <AlertDialog>
                   <AlertDialogTrigger>
                     <div className="bg-blue-300 hover:bg-blue-400 hover:cursor-grab px-4 py-2 rounded-md">
-                      Transisted
+                      Đang vận chuyển
                     </div>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
@@ -299,8 +302,7 @@ export const ListOrdersKiot = (props: any) => {
                             .catch((e) => console.log(e));
                           if (dataFetch) {
                             toast({
-                              title:
-                                "Da ban giao cho don vi van chuyen thanh cong",
+                              title: "Dang tren duong den voi nguoi dung",
                             });
                             refresh();
                           } else {
@@ -311,18 +313,18 @@ export const ListOrdersKiot = (props: any) => {
                           }
                         }}
                       >
-                        YES
+                        Đồng ý
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
               );
-            }  else if (status == "inTransist") {
+            } else if (status == "inTransist") {
               return (
                 <AlertDialog>
                   <AlertDialogTrigger>
                     <div className="bg-blue-300 hover:bg-blue-400 hover:cursor-grab px-4 py-2 rounded-md">
-                      Delivered
+                      Đến người dùng
                     </div>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
@@ -366,16 +368,14 @@ export const ListOrdersKiot = (props: any) => {
 };
 
 export const ShowOrdersKiot = (props: any) => {
-
   const { data } = useGetIdentity();
 
   const user = data?.user;
 
-
   if (checkPermission("OrdersKiot-Managment", user?.permissions) == false) {
     return (
       <div className="w-full h-[50vh] flex flex-col items-center justify-center text-xl font-medium">
-        Ban khong co quyen truy cap
+        Bạn không có quyền truy cập
       </div>
     );
   }
@@ -588,7 +588,10 @@ export const ShowOrdersKiot = (props: any) => {
           </div>
         </TabbedShowLayout.Tab>
         <TabbedShowLayout.Tab className="mb-8" label="Product In Order">
-          <ReferenceManyField reference="products-in-order-kiots" target="idOfOrder">
+          <ReferenceManyField
+            reference="products-in-order-kiots"
+            target="idOfOrder"
+          >
             <Datagrid bulkActionButtons={false}>
               <ReferenceField
                 source="idOfProduct"

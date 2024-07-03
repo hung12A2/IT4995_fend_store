@@ -108,7 +108,7 @@ export const ListProducts = (props: any) => {
                 return (
                   <div className="flex flex-row justify-center items-center">
                     <div className="w-2 h-2 mr-2 rounded-full bg-green-400"></div>
-                    <div>active</div>
+                    <div>Hoạt động</div>
                   </div>
                 );
               } else if (record.status == "pending") {
@@ -122,7 +122,7 @@ export const ListProducts = (props: any) => {
                 return (
                   <div className="flex flex-row justify-center items-center">
                     <div className="w-2 h-2 mr-2 rounded-full bg-red-400"></div>
-                    <div>banned</div>
+                    <div>Ngừng hoạt động</div>
                   </div>
                 );
               }
@@ -138,17 +138,17 @@ export const ListProducts = (props: any) => {
                   <AlertDialog>
                     <AlertDialogTrigger>
                       <div className="bg-red-300 hover:bg-red-400 hover:cursor-grab px-4 py-2 rounded-md">
-                        Ban
+                        Ngừng bán
                       </div>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
                         <AlertDialogDescription>
-                          Are you sure you want ban this user ?
+                          Bạn có muốn ngừng bán sản phẩm nầy ?
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>Hủy</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={async () => {
                             const dataFetch = await axios
@@ -172,7 +172,7 @@ export const ListProducts = (props: any) => {
                             refresh();
                           }}
                         >
-                          YES
+                          Đồng ý
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
@@ -183,17 +183,17 @@ export const ListProducts = (props: any) => {
                   <AlertDialog>
                     <AlertDialogTrigger>
                       <div className="bg-blue-300 hover:bg-blue-400 hover:cursor-grab px-4 py-2 rounded-md">
-                        UnBan
+                        Hoạt động
                       </div>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
                         <AlertDialogDescription>
-                          Are you sure you want unban this product ?
+                          Bạn muốn bản lại sản phầm này ?
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>Hủy</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={async () => {
                             const dataFetch = await axios
@@ -216,7 +216,7 @@ export const ListProducts = (props: any) => {
                             refresh();
                           }}
                         >
-                          YES
+                          Đồng ý
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
@@ -292,7 +292,7 @@ export const ShowProducts = (props: any) => {
   if (checkPermission("Products-Managment", user?.permissions) == false) {
     return (
       <div className="w-full h-[50vh] flex flex-col items-center justify-center text-xl font-medium">
-        Ban khong co quyen truy cap
+        Bạn không có quyền truy cập
       </div>
     );
   }
@@ -321,14 +321,14 @@ export const ShowProducts = (props: any) => {
 
                 if (data.isKiotProduct == true && !user.idOfKiot) {
                   toast({
-                    title: "you dont have Kiot",
+                    title: "Bạn không có kiot",
                   });
 
                   return;
                 }
                 formData.append("isOnlineProduct", data.isOnlineProduct);
                 formData.append("isKiotProduct", data.isKiotProduct);
-                formData.append("idOfKiot", user.idOfKiot);
+                formData.append("idOfKiot", user?.idOfKiot);
                 formData.append("name", data.name);
                 formData.append("price", data.price);
                 formData.append("countInStock", data.countInStock);
@@ -355,11 +355,11 @@ export const ShowProducts = (props: any) => {
                     console.log(res);
                     if (res.code == 200) {
                       toast({
-                        title: "Update Success",
+                        title: "Cập nhập  thành công",
                       });
                     } else {
                       toast({
-                        title: "Update Fail",
+                        title: "Cập nhập thất bại",
                       });
                     }
                   })
