@@ -17,7 +17,7 @@ const ForgetPassEmployee = () => {
   const onSubmit = async (data: any) => {
     const { email } = data;
     const dataFetch = await axios
-      .post("/forgotPassword/employee", { email })
+      .post("/forgotPassword/employee", { email, host: window?.location?.origin })
       .then((res) => res.data)
       .catch((e) => console.log(e));
 
